@@ -4,24 +4,24 @@
 #include <stdbool.h>
 
 typedef enum {
-  c, d, i, e, E, f, g, G, o, s, u, x, X, p, n, symbol,
+  c, d, i, e, E, f, g, G, o, s, u, x, X, p, n, percent,
 } s21_format_spec;
 
 typedef enum {
-  CHAR,
-  DECIMAL,
-  FLOAT,
-  STRING,
-  NREAD,
-  POINTER,
-  SYMBOL,
+  VAR_CHAR,
+  VAR_DECIMAL,
+  VAR_FLOAT,
+  VAR_STRING,
+  VAR_NREAD,
+  VAR_POINTER,
+  VAR_SYMBOL,
 } s21_variable_type;
 
 typedef enum {
-  SHORT,
-  DEFAULT,
-  LONG,
-  LONG_LONG,
+  LEN_SHORT,
+  LEN_DEFAULT,
+  LEN_LONG,
+  LEN_LONG_LONG,
 } s21_format_length;
 
 typedef struct {
@@ -33,21 +33,22 @@ typedef struct {
 } s21_format_flags;
 
 typedef struct {
+  char val;
   s21_format_spec spec;
   s21_variable_type var;
   s21_format_length len;
   s21_format_flags flags;
   int width;
-  bool has_width;
   int precision;
+  bool has_width;
   bool has_precision;
   bool width_from_arg;
   bool precision_from_arg;
   bool valid;
 } s21_specifier;
 
-void init_spec(s21_specifier *spec);
-void parse_spec(const char **format, int pos, s21_specifier *spec);
-void validate_spec(s21_specifier);
+void s21_set_default_spec(s21_specifier *spec);
+void s21_parse_spec(const char *format, s21_specifier *spec);
+void s21_validate_spec(s21_specifier *spec);
 
 #endif
