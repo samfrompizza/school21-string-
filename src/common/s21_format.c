@@ -1,4 +1,8 @@
 #include "s21_format.h"
+
+#include <ctype.h>
+#include <stdlib.h>
+
 #include "../string/s21_string.h"
 
 // Helper static functions declaration
@@ -34,12 +38,29 @@ static const char *parse_flags(const char *format, s21_specifier *spec) {
 }
 
 static const char *parse_width(const char *format, s21_specifier *spec) {
-  // логика ширины
+  if (*format == '*') {
+    spec->width_from_arg = true;
+    spec->has_width = true;
+    format++;
+  } else if (isdigit(*format)) {
+    spec->has_width = true;
+    spec->width = atoi(format);
+  }
+
   return format;
 }
 
 static const char *parse_precision(const char *format, s21_specifier *spec) {
-  // логика точности
+  if (*format == '.') {
+    spec->has_precision = true;
+    format++;
+  }
+  // TODO: precision set by *
+  /*
+  if (spec->has_precision) {
+    spec->precision = atoi(format);
+  }
+  */
   return format;
 }
 
