@@ -1,6 +1,35 @@
 #include "format.h"
 #include "../string/s21_string.h"
 
+// Helper static functions declaration
+static const char *parse_flags(const char *format, s21_specifier *spec);
+
+// Helper static functions implementation
+static const char *parse_flags(const char *format, s21_specifier *spec) {
+  while (true) {
+    switch (*format) {
+      case '-':
+        spec->flags.left_align = true;
+        break;
+      case '+':
+        spec->flags.show_sign = true;
+        break;
+      case ' ':
+        spec->flags.space_sign = true;
+        break;
+      case '#':
+        spec->flags.alt_form = true;
+        break;
+      case '0':
+        spec->flags.zero_pad = true;
+        break;
+      default:
+        return format;
+    }
+    format++;
+  }
+}
+
 void s21_set_default_spec(s21_specifier *spec) {
   spec->val = 0;
   spec->spec = 0;
@@ -23,9 +52,8 @@ void s21_set_default_spec(s21_specifier *spec) {
   spec->valid = false;
 }
 
-void s21_parse_spec(const char *format, s21_specifier *spec) {
+void s21_parse_spec(const char **format, s21_specifier *spec) {
   if (!format) return;
-  
 }
 
 void s21_validate_spec(s21_specifier *spec);
