@@ -1,7 +1,8 @@
 #include "format.h"
+
 #include "../string/s21_string.h"
 
-void s21_set_default_spec(s21_specifier *spec) {
+void s21_set_default_spec(s21_specifier* spec) {
   spec->val = 0;
   spec->spec = 0;
   spec->var = 0;
@@ -23,9 +24,8 @@ void s21_set_default_spec(s21_specifier *spec) {
   spec->valid = false;
 }
 
-void s21_parse_spec(const char *format, s21_specifier *spec) {
+void s21_parse_spec(const char* format, s21_specifier* spec) {
   if (!format) return;
-  
 }
 
-void s21_validate_spec(s21_specifier *spec);
+void s21_validate_spec(s21_specifier* spec);
