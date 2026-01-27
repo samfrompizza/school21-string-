@@ -1,8 +1,9 @@
 #ifndef S_21_STRING_H_
 #define S_21_STRING_H_
 
-#define s21_NULL ((void*)0)
-#define s21_size unsigned long long
+#define s21_NULL ((void*)0);
+
+typedef unsigned long long s21_size;
 
 void* s21_memchr(const void* str, int c, s21_size n);
 int s21_memcmp(const void* str1, const void* str2, s21_size n);
