@@ -1,5 +1,7 @@
 #include "scan.h"
 
+#include <ctype.h>
+
 #include "../common/s21_format.h"
 
 const char* scan_char(ScanState* state);
@@ -43,4 +45,52 @@ const char* scan_string_var(ScanState* state) {
 const char* scan_char(ScanState* state) {
   *(char*)state->param = *state->str;
   return state->str + 1;
+}
+
+const char* scan_decimal(ScanState* state) {
+  if (state) {  // TODO: replace check with signed number
+    long long value = 0;
+    int sign = 1;
+    int parsed_digits = 0;
+
+    if (*(state->str) == '+' || *(state->str) == '-') {
+      sign = *(state->str) == '+' ? +1 : -1;
+      ++state->str;
+      if (state->spec->width) {
+        state->spec->width--;
+      }
+    }
+
+    while (*(state->str) && isdigit(*(state->str)) && state->spec->width--) {
+      value = value * 10 + *(state->str++ - '0');
+      ++parsed_digits;
+    }
+
+    if (parsed_digits == 0) {
+      return state->str;
+    }
+
+    value *= sign;
+
+    switch (state->spec->len) {
+      case LEN_DEFAULT:
+        *(int*)(state->param) = value;
+        break;
+      case LEN_SHORT:
+        *(short*)(state->param) = value;
+        break;
+      case LEN_LONG:
+        *(long*)(state->param) = value;
+        break;
+      case LEN_LONG_LONG:
+        *(long long*)(state->param) = value;
+        break;
+      default:
+        break;
+    }
+
+    return state->str;
+  } else {
+    // TODO: add unsigned
+  }
 }
