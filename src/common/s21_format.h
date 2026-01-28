@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 
-
 typedef enum {
   VAR_CHAR,
   VAR_DECIMAL,
@@ -44,7 +43,7 @@ typedef struct {
   bool valid;
 } s21_specifier;
 
-const char *s21_parse_spec(const char *format, s21_specifier *spec);
-void s21_validate_spec(s21_specifier *spec);
+const char* s21_parse_spec(const char* format, s21_specifier* spec);
+void s21_validate_spec(s21_specifier* spec);
 
 #endif
