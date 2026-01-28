@@ -4,25 +4,6 @@
 #include <stdbool.h>
 
 typedef enum {
-  c,
-  d,
-  i,
-  e,
-  E,
-  f,
-  g,
-  G,
-  o,
-  s,
-  u,
-  x,
-  X,
-  p,
-  n,
-  percent,
-} s21_format_spec;
-
-typedef enum {
   VAR_CHAR,
   VAR_DECIMAL,
   VAR_FLOAT,
@@ -50,7 +31,6 @@ typedef struct {
 
 typedef struct {
   char val;
-  s21_format_spec spec;
   s21_variable_type var;
   s21_format_length len;
   s21_format_flags flags;

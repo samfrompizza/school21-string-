@@ -81,54 +81,47 @@ static const char *parse_precision(const char *format, s21_specifier *spec) {
 
 static const char *parse_length(const char *format, s21_specifier *spec) {
   if (*format == 'h') {
-      spec->len = LEN_SHORT;
-      format++;
+    spec->len = LEN_SHORT;
+    format++;
   } else if (*format == 'l') {
-      // Тут проверка на ll
+    format++;
+    if (*format == 'l') {
+      spec->len = LEN_LONG_LONG;
       format++;
-      if (*format == 'l') {
-           spec->len = LEN_LONG_LONG;
-           format++;
-      } else {
-           spec->len = LEN_LONG;
-      }
+    } else {
+      spec->len = LEN_LONG;
+    }
   } else if (*format == 'L') {
-      spec->len = LEN_LONG_DOUBLE;
-      format++;
+    spec->len = LEN_LONG_DOUBLE;
+    format++;
   }
 
   return format;
 }
 
 static const char *parse_spec_letter(const char *format, s21_specifier *spec) {
-  spec->valid = true; // Single responsibility??
+  spec->valid = true;  // Single responsibility??
   spec->val = *format;
 
-  switch (*format) {
-    case 'c': spec->spec = c; spec->var = VAR_CHAR; break;
-    case 'd': spec->spec = d; spec->var = VAR_DECIMAL; break;
-    case 'i': spec->spec = i; spec->var = VAR_DECIMAL; break;
-    case 'e': spec->spec = e; spec->var = VAR_FLOAT; break;
-    case 'E': spec->spec = E; spec->var = VAR_FLOAT; break;
-    case 'f': spec->spec = f; spec->var = VAR_FLOAT; break;
-    case 'g': spec->spec = g; spec->var = VAR_FLOAT; break;
-    case 'G': spec->spec = G; spec->var = VAR_FLOAT; break;
-    case 'o': spec->spec = o; spec->var = VAR_DECIMAL; break;
-    case 's': spec->spec = s; spec->var = VAR_STRING; break;
-    case 'u': spec->spec = u; spec->var = VAR_DECIMAL; break;
-    case 'x': spec->spec = x; spec->var = VAR_DECIMAL; break;
-    case 'X': spec->spec = X; spec->var = VAR_DECIMAL; break;
-    case 'p': spec->spec = p; spec->var = VAR_POINTER; break;
-    case 'n': spec->spec = n; spec->var = VAR_NREAD; break;
-    case '%': spec->spec = percent; spec->var = VAR_SYMBOL; break;
-    default: 
-      spec->valid = false;
-      break;
-  }
+  if (*format == 'c')
+    spec->var = VAR_CHAR;
+  else if (s21_strchr("diouxX", *format))
+    spec->var = VAR_DECIMAL;
+  else if (s21_strchr("eEfgG", *format))
+    spec->var = VAR_FLOAT;
+  else if (*format == 's')
+    spec->var = VAR_STRING;
+  else if (*format == 'p')
+    spec->var = VAR_POINTER;
+  else if (*format == 'n')
+    spec->var = VAR_NREAD;
+  else if (*format == '%')
+    spec->var = VAR_SYMBOL;
+  else
+    spec->valid = false;
 
-  if (spec->valid) {
-    format++;
-  }
+  if (spec->valid) format++;
+
   return format;
 }
 
@@ -159,15 +152,14 @@ void s21_validate_spec(s21_specifier *spec) {
   }
 
   // precision declines '0' for some types
-  if (spec->has_precision && (
-      spec->spec == d || spec->spec == i || spec->spec == o || 
-      spec->spec == u || spec->spec == x || spec->spec == X)) {
+  if (spec->has_precision && spec->var == VAR_DECIMAL) {
     spec->flags.zero_pad = false;
   }
 
-  if (spec->spec == u || spec->spec == o || spec->spec == x || spec->spec == X || 
-      spec->spec == s || spec->spec == c || spec->spec == p) {
-      spec->flags.show_sign = false;
-      spec->flags.space_sign = false;
+  if (spec->val == 'u' || spec->val == 'o' || spec->val == 'x' ||
+      spec->val == 'X' || spec->val == 's' || spec->val == 'c' ||
+      spec->val == 'p') {
+    spec->flags.show_sign = false;
+    spec->flags.space_sign = false;
   }
 }
