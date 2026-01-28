@@ -33,10 +33,11 @@ typedef enum {
 } s21_variable_type;
 
 typedef enum {
-  LEN_SHORT,
   LEN_DEFAULT,
+  LEN_SHORT,
   LEN_LONG,
   LEN_LONG_LONG,
+  LEN_LONG_DOUBLE,
 } s21_format_length;
 
 typedef struct {
