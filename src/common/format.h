@@ -62,7 +62,6 @@ typedef struct {
   bool valid;
 } s21_specifier;
 
-void s21_set_default_spec(s21_specifier* spec);
 void s21_parse_spec(const char* format, s21_specifier* spec);
 void s21_validate_spec(s21_specifier* spec);
 
