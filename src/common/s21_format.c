@@ -1,9 +1,7 @@
 #include "s21_format.h"
+#include "../string/s21_string.h"
 
 #include <ctype.h>
-#include <stdlib.h>
-
-#include "../string/s21_string.h"
 
 // Helper static functions declaration
 static const char *parse_flags(const char *format, s21_specifier *spec);
