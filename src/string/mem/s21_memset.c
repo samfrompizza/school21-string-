@@ -1,10 +1,10 @@
-#include "s21_string.h"
+#include "../s21_string.h"
 
-void *s21_memset(void *str, int c, s21_size_t n) {
-  unsigned char *s = (unsigned char *)str;
-  unsigned char ch = (unsigned char)c;
+void* s21_memset(void* str, int c, s21_size n) {
+  unsigned char* s = (unsigned char*)str;
+  unsigned char ch = c;
 
-  for (s21_size_t i = 0; i < n; i++) {
+  for (s21_size i = 0; i < n; i++) {
     s[i] = ch;
   }
 
