@@ -4,13 +4,13 @@
 
 #include "../common/s21_format.h"
 
-const char* scan_char(ScanState* state);
-const char* scan_decimal(ScanState* state);
-const char* scan_float(ScanState* state);
-const char* scan_string(ScanState* state);
-const char* scan_nread(ScanState* state);
-const char* scan_pointer(ScanState* state);
-const char* scan_symbol(ScanState* state);
+static const char* scan_char(ScanState* state);
+static const char* scan_decimal(ScanState* state);
+static const char* scan_float(ScanState* state);
+static const char* scan_string(ScanState* state);
+static const char* scan_nread(ScanState* state);
+static const char* scan_pointer(ScanState* state);
+static const char* scan_symbol(ScanState* state);
 
 const char* scan_string_var(ScanState* state) {
   switch (state->spec->var) {
@@ -42,55 +42,78 @@ const char* scan_string_var(ScanState* state) {
   return state->str;
 }
 
-const char* scan_char(ScanState* state) {
+static const char* scan_char(ScanState* state) {
   *(char*)state->param = *state->str;
   return state->str + 1;
 }
 
-const char* scan_decimal(ScanState* state) {
-  if (state) {  // TODO: replace check with signed number
-    long long value = 0;
-    int sign = 1;
-    int parsed_digits = 0;
+static const char* scan_decimal(ScanState* state) {
+  int sign = 1;
 
-    if (*(state->str) == '+' || *(state->str) == '-') {
-      sign = *(state->str) == '+' ? +1 : -1;
-      ++state->str;
-      if (state->spec->width) {
-        state->spec->width--;
-      }
+  if (*(state->str) == '+' || *(state->str) == '-') {
+    sign = *(state->str) == '+' ? +1 : -1;
+    ++state->str;
+    if (state->spec->width) {
+      state->spec->width--;
     }
+  }
 
-    while (*(state->str) && isdigit(*(state->str)) && state->spec->width--) {
-      value = value * 10 + *(state->str++ - '0');
-      ++parsed_digits;
-    }
+  unsigned long long value = 0;
+  int parsed_digits = 0;
 
-    if (parsed_digits == 0) {
-      return state->str;
-    }
+  while (*(state->str) && isdigit(*(state->str)) && state->spec->width--) {
+    value = value * 10 + *(state->str++ - '0');
+    ++parsed_digits;
+  }
 
-    value *= sign;
+  if (parsed_digits == 0) {
+    return state->str;
+  }
 
+  if (state->spec->val == 'u') {
     switch (state->spec->len) {
       case LEN_DEFAULT:
-        *(int*)(state->param) = value;
+        *(unsigned int*)(state->param) = value;
         break;
       case LEN_SHORT:
-        *(short*)(state->param) = value;
+        *(unsigned short*)(state->param) = value;
         break;
       case LEN_LONG:
-        *(long*)(state->param) = value;
+        *(unsigned long*)(state->param) = value;
         break;
       case LEN_LONG_LONG:
-        *(long long*)(state->param) = value;
+        *(unsigned long long*)(state->param) = value;
         break;
       default:
         break;
     }
-
-    return state->str;
   } else {
-    // TODO: add unsigned
+    long long signed_value = sign * (long long)value;
+    switch (state->spec->len) {
+      case LEN_DEFAULT:
+        *(int*)(state->param) = signed_value;
+        break;
+      case LEN_SHORT:
+        *(short*)(state->param) = signed_value;
+        break;
+      case LEN_LONG:
+        *(long*)(state->param) = signed_value;
+        break;
+      case LEN_LONG_LONG:
+        *(long long*)(state->param) = signed_value;
+        break;
+      default:
+        break;
+    }
   }
 }
+
+static const char* scan_float(ScanState* state) {}
+
+static const char* scan_string(ScanState* state) {}
+
+static const char* scan_nread(ScanState* state) {}
+
+static const char* scan_pointer(ScanState* state) {}
+
+static const char* scan_symbol(ScanState* state) {}
