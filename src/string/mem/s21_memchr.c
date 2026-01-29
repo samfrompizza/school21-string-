@@ -2,7 +2,8 @@
 
 void* s21_memchr(const void* str, int c, s21_size n) {
   const unsigned char* s = (const unsigned char*)str;
-  unsigned char ch = c;
+  unsigned char ch = (unsigned char)c;  // оставил, вроде как
+  // отрицательное все сломает
   void* result = s21_NULL;
 
   for (s21_size i = 0; i < n; i++) {
