@@ -1,14 +1,21 @@
-#include "s21_string.h"
+#include "../s21_string.h"
 
-void *s21_memchr(const void *str, int c, s21_size_t n) {
-  const unsigned char *s = (const unsigned char *)str;
-  unsigned char ch = (unsigned char)c;
+char* s21_strchr(const char* str, int c) {
+  char* result = S21_NULL;
+  int found = 0;
 
-  for (s21_size_t i = 0; i < n; i++) {
-    if (s[i] == ch) {
-      return (void *)(s + i);
+  while (*str != '\0' && !found) {
+    if (*str == (char)c) {
+      result = (char*)str;
+      found = 1;
+    } else {
+      str++;
     }
   }
 
-  return S21_NULL;
+  if (!found && (char)c == '\0') {
+    result = (char*)str;
+  }
+
+  return result;
 }

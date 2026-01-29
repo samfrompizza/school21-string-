@@ -1,18 +1,19 @@
-#include "s21_string.h"
+#include "../s21_string.h"
 
-char *s21_strchr(const char *str, int c) {
-  char ch = (char)c;
+char* s21_strrchr(const char* str, int c) {
+  char* result = S21_NULL;
+  const char* current = str;
 
-  while (*str != '\0') {
-    if (*str == ch) {
-      return (char *)str;
+  while (*current != '\0') {
+    if (*current == (char)c) {
+      result = (char*)current;
     }
-    str++;
+    current++;
   }
 
-  if (ch == '\0') {
-    return (char *)str;
+  if ((char)c == '\0') {
+    result = (char*)current;
   }
 
-  return S21_NULL;
+  return result;
 }
