@@ -11,12 +11,12 @@ SRC_DIR = src
 TEST_DIR = tests
 BUILD_DIR = build
 
-# sources
-STRING_SRCS := $(wildcard $(SRC_DIR)/string/**/*.c)
-SSCANF_SRCS := $(wildcard $(SRC_DIR)/sscanf/**/*.c)
-SPRINTF_SRCS := $(wildcard $(SRC_DIR)/sprintf/**/*.c)
-EXTRA_SRCS := $(wildcard $(SRC_DIR)/extra/**/*.c)
-COMMON_SRCS := $(wildcard $(SRC_DIR)/common/**/*.c)
+# sources (include top-level *.c; **/*.c for subdirs)
+STRING_SRCS := $(wildcard $(SRC_DIR)/string/*.c) $(wildcard $(SRC_DIR)/string/**/*.c)
+SSCANF_SRCS := $(wildcard $(SRC_DIR)/sscanf/*.c) $(wildcard $(SRC_DIR)/sscanf/**/*.c)
+SPRINTF_SRCS := $(wildcard $(SRC_DIR)/sprintf/*.c) $(wildcard $(SRC_DIR)/sprintf/**/*.c)
+EXTRA_SRCS := $(wildcard $(SRC_DIR)/extra/*.c) $(wildcard $(SRC_DIR)/extra/**/*.c)
+COMMON_SRCS := $(wildcard $(SRC_DIR)/common/*.c) $(wildcard $(SRC_DIR)/common/**/*.c)
 SRCS := $(COMMON_SRCS) $(STRING_SRCS) $(SSCANF_SRCS) $(SPRINTF_SRCS) $(EXTRA_SRCS)
 
 # objects
@@ -30,11 +30,11 @@ OBJS := $(COMMON_OBJS) $(STRING_OBJS) $(SSCANF_OBJS) $(SPRINTF_OBJS) $(EXTRA_OBJ
 STRING_LIB = s21_string.a
 
 # ==== TEST SOURCES ====
-TEST_STRING_SRCS := $(wildcard $(TEST_DIR)/string/**/*.c)
-TEST_SSCANF_SRCS := $(wildcard $(TEST_DIR)/sscanf/**/*.c)
-TEST_SPRINTF_SRCS := $(wildcard $(TEST_DIR)/sprintf/**/*.c)
-TEST_EXTRA_SRCS := $(wildcard $(TEST_DIR)/extra/**/*.c)
-TEST_COMMON_SRCS := $(wildcard $(TEST_DIR)/common/**/*.c)
+TEST_STRING_SRCS := $(wildcard $(TEST_DIR)/string/*.c) $(wildcard $(TEST_DIR)/string/**/*.c)
+TEST_SSCANF_SRCS := $(wildcard $(TEST_DIR)/sscanf/*.c) $(wildcard $(TEST_DIR)/sscanf/**/*.c)
+TEST_SPRINTF_SRCS := $(wildcard $(TEST_DIR)/sprintf/*.c) $(wildcard $(TEST_DIR)/sprintf/**/*.c)
+TEST_EXTRA_SRCS := $(wildcard $(TEST_DIR)/extra/*.c) $(wildcard $(TEST_DIR)/extra/**/*.c)
+TEST_COMMON_SRCS := $(wildcard $(TEST_DIR)/common/*.c) $(wildcard $(TEST_DIR)/common/**/*.c)
 
 TEST_STRING_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_STRING_SRCS))
 TEST_SSCANF_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_SSCANF_SRCS))
@@ -83,6 +83,10 @@ test_sscanf: $(BUILD_DIR)/tests/sscanf/test_sscanf.o $(TEST_COMMON_OBJS) $(STRIN
 	$(CC) $(CFLAGS) $^ -o test_sscanf $(TEST_LIBS)
 	./test_sscanf
 
+test_scan: $(BUILD_DIR)/sscanf/test_scan.o $(TEST_COMMON_OBJS) $(STRING_LIB)
+	$(CC) $(CFLAGS) $^ -o test_scan $(TEST_LIBS)
+	./test_scan
+
 test_sprintf: $(BUILD_DIR)/tests/sprintf/test_sprintf.o $(TEST_COMMON_OBJS) $(STRING_LIB)
 	$(CC) $(CFLAGS) $^ -o test_sprintf $(TEST_LIBS)
 	./test_sprintf
@@ -95,7 +99,7 @@ test_common: $(TEST_COMMON_OBJS) $(STRING_LIB)
 	$(CC) $(CFLAGS) $^ -o test_common $(TEST_LIBS)
 	./test_common
 
-test_all: test_string test_sscanf test_sprintf test_extra test_common
+test_all: test_string test_sscanf test_scan test_sprintf test_extra test_common
 
 test: test_all
 
@@ -123,7 +127,7 @@ leak_check: leak_check_all
 rebuild: clean all
 
 clean:
-	rm -rf $(BUILD_DIR) $(STRING_LIB) test_string test_sscanf test_sprintf test_extra test_common *.gc* report gcov_report.info
+	rm -rf $(BUILD_DIR) $(STRING_LIB) test_string test_sscanf test_scan test_sprintf test_extra test_common *.gc* report gcov_report.info
 
 # ==== TOOLS ====
 gcov_report:

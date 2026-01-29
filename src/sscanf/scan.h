@@ -12,6 +12,6 @@ typedef struct {
   void* param;
 } ScanState;
 
-const char* scan_string_var(ScanState* state);
+extern const char* scan_string_var(ScanState* state);
 
 #endif

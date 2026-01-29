@@ -62,7 +62,7 @@ static const char* scan_decimal(ScanState* state) {
   int parsed_digits = 0;
 
   while (*(state->str) && isdigit(*(state->str)) && state->spec->width--) {
-    value = value * 10 + *(state->str++ - '0');
+    value = value * 10 + (*state->str++ - '0');
     ++parsed_digits;
   }
 
@@ -91,13 +91,13 @@ static const char* scan_decimal(ScanState* state) {
     long long signed_value = sign * (long long)value;
     switch (state->spec->len) {
       case LEN_DEFAULT:
-        *(int*)(state->param) = signed_value;
+        *(int*)(state->param) = (int)signed_value;
         break;
       case LEN_SHORT:
-        *(short*)(state->param) = signed_value;
+        *(short*)(state->param) = (short)signed_value;
         break;
       case LEN_LONG:
-        *(long*)(state->param) = signed_value;
+        *(long*)(state->param) = (long)signed_value;
         break;
       case LEN_LONG_LONG:
         *(long long*)(state->param) = signed_value;
@@ -106,14 +106,15 @@ static const char* scan_decimal(ScanState* state) {
         break;
     }
   }
+  return state->str;
 }
 
-static const char* scan_float(ScanState* state) {}
+static const char* scan_float(ScanState* state) { return state->str; }
 
-static const char* scan_string(ScanState* state) {}
+static const char* scan_string(ScanState* state) { return state->str; }
 
-static const char* scan_nread(ScanState* state) {}
+static const char* scan_nread(ScanState* state) { return state->str; }
 
-static const char* scan_pointer(ScanState* state) {}
+static const char* scan_pointer(ScanState* state) { return state->str; }
 
-static const char* scan_symbol(ScanState* state) {}
+static const char* scan_symbol(ScanState* state) { return state->str; }
