@@ -1,14 +1,14 @@
 #include "../s21_string.h"
 
 int s21_memcmp(const void* str1, const void* str2, s21_size n) {
-  const unsigned char* s1 = (const unsigned char*)str1;
-  const unsigned char* s2 = (const unsigned char*)str2;
+  const unsigned char* mem_block1 = (const unsigned char*)str1;
+  const unsigned char* mem_block2 = (const unsigned char*)str2;
   int diff = 0;
+  s21_size i = 0;
 
-  for (s21_size i = 0; i < n && diff == 0; i++) {
-    if (s1[i] != s2[i]) {
-      diff = s1[i] - s2[i];  // тут unsigned char же будет?
-      // может не поместиться в int ?
+  for (; i < n && diff == 0; ++i) {
+    if (mem_block1[i] != mem_block2[i]) {
+      diff = (int)mem_block1[i] - (int)mem_block2[i];
     }
   }
 

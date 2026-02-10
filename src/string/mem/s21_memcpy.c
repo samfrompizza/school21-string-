@@ -1,11 +1,12 @@
 #include "../s21_string.h"
 
 void* s21_memcpy(void* dest, const void* src, s21_size n) {
-  unsigned char* d = (unsigned char*)dest;
-  const unsigned char* s = (const unsigned char*)src;
+  unsigned char* destination = (unsigned char*)dest;
+  const unsigned char* source = (const unsigned char*)src;
+  s21_size i = 0;
 
-  for (s21_size i = 0; i < n; i++) {
-    d[i] = s[i];
+  for (; i < n; ++i) {
+    destination[i] = source[i];
   }
 
   return dest;

@@ -2,16 +2,15 @@
 
 char* s21_strpbrk(const char* str1, const char* str2) {
   char* result = S21_NULL;
+  const char* s1;
+  const char* s2;
 
-  while (*str1 != '\0' && result == S21_NULL) {
-    const char* check = str2;
-    while (*check != '\0' && result == S21_NULL) {
-      if (*str1 == *check) {
-        result = (char*)str1;
+  for (s1 = str1; *s1 != '\0' && result == S21_NULL; ++s1) {
+    for (s2 = str2; *s2 != '\0' && result == S21_NULL; ++s2) {
+      if (*s1 == *s2) {
+        result = (char*)s1;
       }
-      check++;
     }
-    str1++;
   }
 
   return result;

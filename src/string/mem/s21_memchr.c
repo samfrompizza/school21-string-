@@ -1,14 +1,14 @@
 #include "../s21_string.h"
 
 void* s21_memchr(const void* str, int c, s21_size n) {
-  const unsigned char* s = (const unsigned char*)str;
-  unsigned char ch = (unsigned char)c;  // оставил, вроде как
-  // отрицательное все сломает
+  const unsigned char* search_string = (const unsigned char*)str;
+  unsigned char search_char = (unsigned char)c;
+  s21_size i = 0;
   void* result = S21_NULL;
 
-  for (s21_size i = 0; i < n; i++) {
-    if (s[i] == ch && result == S21_NULL) {
-      result = (void*)(s + i);
+  for (; i < n && result == S21_NULL; ++i) {
+    if (search_string[i] == search_char) {
+      result = (void*)(search_string + i);
     }
   }
 

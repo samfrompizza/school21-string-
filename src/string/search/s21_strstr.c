@@ -2,25 +2,18 @@
 
 char* s21_strstr(const char* haystack, const char* needle) {
   char* result = S21_NULL;
-  int found = 0;
 
   if (*needle == '\0') {
     result = (char*)haystack;
-    found = 1;
-  }
+  } else {
+    s21_size needle_len = s21_strlen(needle);
+    s21_size haystack_len = s21_strlen(haystack);
+    s21_size i = 0;
 
-  for (const char* h = haystack; *h != '\0' && !found; h++) {
-    const char* h_temp = h;
-    const char* n = needle;
-
-    while (*h_temp != '\0' && *n != '\0' && *h_temp == *n) {
-      h_temp++;
-      n++;
-    }
-
-    if (*n == '\0') {
-      result = (char*)h;
-      found = 1;
+    for (i = 0; i + needle_len <= haystack_len && result == S21_NULL; ++i) {
+      if (s21_strncmp(haystack + i, needle, needle_len) == 0) {
+        result = (char*)(haystack + i);
+      }
     }
   }
 
