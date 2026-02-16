@@ -2,7 +2,7 @@
 
 char* s21_strchr(const char* str, int c) {
   char* found = S21_NULL;
-  const char* current = str;
+  const unsigned char* current = (const unsigned char*)str;
   unsigned char search_char = (unsigned char)c;
 
   for (; *current != '\0' && found == S21_NULL; ++current) {

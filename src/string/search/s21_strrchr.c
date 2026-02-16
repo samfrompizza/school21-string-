@@ -3,14 +3,15 @@
 char* s21_strrchr(const char* str, int c) {
   char* found = S21_NULL;
   const char* current = str;
+  unsigned char search_char = (unsigned char)c;
 
   for (; *current != '\0'; ++current) {
-    if (*current == (unsigned char)c) {
+    if (*current == search_char) {
       found = (char*)current;
     }
   }
 
-  if ((unsigned char)c == '\0') {
+  if (search_char == '\0') {
     found = (char*)current;
   }
 
