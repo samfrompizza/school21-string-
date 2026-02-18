@@ -1,19 +1,20 @@
+#include "s21_sprintf_helpers.h"
+#include "s21_sprintf.h"
 #include "../common/s21_format.h"
-#include "../string/s21_string.h"
 
-#include <stdarg.h>
+static int append_to_output(char **dst, const char *src, int len) {
+  if (dst == S21_NULL || *dst == S21_NULL || src == S21_NULL || len < 0) return -1;
 
-static void handle_spec_error(s21_specifier *spec);
-static char *handle_char(char *str, s21_specifier *spec, char c);
-static char *handle_decimal(char *str, s21_specifier *spec, ...);
-static char *handle_float(char *str, s21_specifier *spec, ...);
-static char *handle_nread(char *str, s21_specifier *spec, int n);
-static char *handle_pointer(char *str, s21_specifier *spec, void *p);
-static char *handle_string(char *str, s21_specifier *spec, const char *s);
-static char *handle_percent(char *str, s21_specifier *spec);
+  for (int i = 0; i < len; i++) {
+    **dst = src[i];
+    (*dst)++;
+  }
+
+  return 0;
+}
 
 int s21_sprintf(char *str, const char *format, ...) {
-  if (str == S21_NULL || format == S21_NULL) return 0;
+  if (str == S21_NULL || format == S21_NULL) return -1;
 
   va_list ap;
   va_start(ap, format);
@@ -26,49 +27,43 @@ int s21_sprintf(char *str, const char *format, ...) {
       *str = *fmt;
       str++;
       fmt++;
-    } else {
-      fmt++;
-      s21_specifier spec = {};
-      fmt = s21_parse_spec(fmt, &spec);
-      s21_validate_spec(&spec);
+      continue;
+    }
 
-      if (!spec.valid) {
-        handle_spec_error(&spec);
+    fmt++;
+    s21_specifier spec = {0};
+    fmt = s21_parse_spec(fmt, &spec);
+    s21_validate_spec(&spec);
+
+    if (!spec.valid) {
+      va_end(ap);
+      return -1;
+    }
+
+    read_width_precision_from_args(&spec, &ap);
+
+    switch (spec.var) {
+      case VAR_DECIMAL: {
+        if (spec.val != 'd' && spec.val != 'i') {
+          va_end(ap);
+          return -1;
+        }
+
+        char out_buf[S21_INT_BUF] = {0};
+        int out_len = handle_decimal_spec(out_buf, sizeof(out_buf), &spec, &ap);
+        if (out_len < 0 || append_to_output(&str, out_buf, out_len) < 0) {
+          va_end(ap);
+          return -1;
+        }
+        break;
+      }
+      default:
         va_end(ap);
         return -1;
-      }
-
-      switch (spec.var)
-      {
-      case VAR_CHAR:
-        /* code */
-        break;
-      case VAR_DECIMAL:
-        /* code */
-        break;
-      case VAR_FLOAT:
-        /* code */
-        break;
-      case VAR_NREAD:
-        /* code */
-        break;
-      case VAR_POINTER:
-        /* code */
-        break;
-      case VAR_STRING:
-        /* code */
-        break;
-      case VAR_SYMBOL:
-        /* code */
-        break;
-      
-      default:
-        break;
-      }
     }
   }
-  
+
   *str = '\0';
   va_end(ap);
-  return str - start;
+  return (int)(str - start);
 }

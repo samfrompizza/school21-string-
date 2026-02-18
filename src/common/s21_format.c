@@ -1,7 +1,17 @@
 #include "s21_format.h"
 #include "../string/s21_string.h"
-
 #include <ctype.h>
+#include <stddef.h>
+
+static bool s21_contains_char(const char *set, char c) {
+  if (set == NULL) return false;
+  while (*set != '\0') {
+    if (*set == c) return true;
+    set++;
+  }
+  return false;
+}
+
 
 // Helper static functions declaration
 static const char *parse_flags(const char *format, s21_specifier *spec);
@@ -103,9 +113,9 @@ static const char *parse_spec_letter(const char *format, s21_specifier *spec) {
 
   if (*format == 'c')
     spec->var = VAR_CHAR;
-  else if (s21_strchr("diouxX", *format))
+  else if (s21_contains_char("diouxX", *format))
     spec->var = VAR_DECIMAL;
-  else if (s21_strchr("eEfgG", *format))
+  else if (s21_contains_char("eEfgG", *format))
     spec->var = VAR_FLOAT;
   else if (*format == 's')
     spec->var = VAR_STRING;
