@@ -125,7 +125,7 @@ static const char *parse_spec_letter(const char *format, s21_specifier *spec) {
 
 // Public API
 const char *s21_parse_spec(const char *format, s21_specifier *spec) {
-  if (!format) return NULL;
+  if (!format) return S21_NULL;
 
   format = parse_flags(format, spec);
   format = parse_width(format, spec);

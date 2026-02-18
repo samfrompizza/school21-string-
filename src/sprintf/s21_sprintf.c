@@ -1,6 +1,7 @@
-#include "s21_sprintf.h"
 #include "../common/s21_format.h"
 #include "../string/s21_string.h"
+
+#include <stdarg.h>
 
 static void handle_spec_error(s21_specifier *spec);
 static char *handle_char(char *str, s21_specifier *spec, char c);
@@ -12,7 +13,7 @@ static char *handle_string(char *str, s21_specifier *spec, const char *s);
 static char *handle_percent(char *str, s21_specifier *spec);
 
 int s21_sprintf(char *str, const char *format, ...) {
-  if (str == NULL || format == NULL) return 0;
+  if (str == S21_NULL || format == S21_NULL) return 0;
 
   va_list ap;
   va_start(ap, format);
