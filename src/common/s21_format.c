@@ -103,31 +103,36 @@ static const char* parse_spec_letter(const char* format, s21_specifier* spec) {
   spec->valid = true;  // Single responsibility??
   spec->val = *format;
 
-  if (*format == 'c')
+  if (*format == 'c') {
     spec->var = VAR_CHAR;
-  else if (s21_strchr("diouxX", *format))
+  } else if (s21_strchr("diouxX", *format)) {
     spec->var = VAR_DECIMAL;
-  else if (s21_strchr("eEfgG", *format))
+  } else if (s21_strchr("eEfgG", *format)) {
     spec->var = VAR_FLOAT;
-  else if (*format == 's')
+  } else if (*format == 's') {
     spec->var = VAR_STRING;
-  else if (*format == 'p')
+  } else if (*format == 'p') {
     spec->var = VAR_POINTER;
-  else if (*format == 'n')
+  } else if (*format == 'n') {
     spec->var = VAR_NREAD;
-  else if (*format == '%')
+  } else if (*format == '%') {
     spec->var = VAR_SYMBOL;
-  else
+  } else {
     spec->valid = false;
+  }
 
-  if (spec->valid) format++;
+  if (spec->valid) {
+    format++;
+  }
 
   return format;
 }
 
 // Public API
 const char* s21_parse_spec(const char* format, s21_specifier* spec) {
-  if (!format) return NULL;
+  if (!format) {
+    return NULL;
+  }
 
   format = parse_flags(format, spec);
   format = parse_width(format, spec);
@@ -139,7 +144,9 @@ const char* s21_parse_spec(const char* format, s21_specifier* spec) {
 }
 
 void s21_validate_spec(s21_specifier* spec) {
-  if (!spec->valid) return;
+  if (!spec->valid) {
+    return;
+  }
 
   // '-' declines '0'
   if (spec->flags.left_align) {
