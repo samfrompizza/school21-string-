@@ -1,0 +1,29 @@
+# Base style
+BasedOnStyle: Google
+
+# Indentation
+IndentWidth: 2
+AccessModifierOffset: -1
+
+# Blocks & short statements
+AllowShortBlocksOnASingleLine: Never
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+KeepEmptyLinesAtTheStartOfBlocks: true
+InsertBraces: true
+
+# Constructor initializers
+BreakConstructorInitializers: AfterColon
+
+# Function declaration formatting
+BinPackParameters: true
+AllowAllParametersOfDeclarationOnNextLine: false
+PenaltyReturnTypeOnItsOwnLine: 20
+
+# Include & pointer style
+SortIncludes: true
+DerivePointerAlignment: false
+
+# Line length
+ColumnLimit: 80
