@@ -8,7 +8,7 @@
 typedef struct {
   s21_specifier* spec;
   const char* str;
-
+  const char* str_start; /* For %n: chars read = str - str_start */
   void* param;
 } ScanState;
 
