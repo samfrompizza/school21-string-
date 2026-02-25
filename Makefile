@@ -87,6 +87,10 @@ test_scan: $(BUILD_DIR)/sscanf/test_scan.o $(TEST_COMMON_OBJS) $(STRING_LIB)
 	$(CC) $(CFLAGS) $^ -o test_scan $(TEST_LIBS)
 	./test_scan
 
+test_scan_github: $(BUILD_DIR)/sscanf/test_scan.o $(BUILD_DIR)/sscanf/test_scan_github.o $(TEST_COMMON_OBJS) $(STRING_LIB)
+	$(CC) $(CFLAGS) $^ -o test_scan $(TEST_LIBS)
+	./test_scan
+
 test_sprintf: $(BUILD_DIR)/tests/sprintf/test_sprintf.o $(TEST_COMMON_OBJS) $(STRING_LIB)
 	$(CC) $(CFLAGS) $^ -o test_sprintf $(TEST_LIBS)
 	./test_sprintf

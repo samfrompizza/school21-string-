@@ -21,23 +21,26 @@
 static void build_format(char* out, size_t cap, int width,
                          s21_format_length len, char val, int with_n) {
   const char* len_str = "";
-  if (len == LEN_SHORT)
+  if (len == LEN_SHORT) {
     len_str = "h";
-  else if (len == LEN_LONG)
+  } else if (len == LEN_LONG) {
     len_str = "l";
-  else if (len == LEN_LONG_LONG)
+  } else if (len == LEN_LONG_LONG) {
     len_str = "ll";
+  }
 
   if (with_n) {
-    if (width > 0 && width < NO_WIDTH_SENTINEL)
+    if (width > 0 && width < NO_WIDTH_SENTINEL) {
       (void)snprintf(out, cap, "%%%d%s%c%%n", width, len_str, val);
-    else
+    } else {
       (void)snprintf(out, cap, "%%%s%c%%n", len_str, val);
+    }
   } else {
-    if (width > 0 && width < NO_WIDTH_SENTINEL)
+    if (width > 0 && width < NO_WIDTH_SENTINEL) {
       (void)snprintf(out, cap, "%%%d%s%c", width, len_str, val);
-    else
+    } else {
       (void)snprintf(out, cap, "%%%s%c", len_str, val);
+    }
   }
 }
 
@@ -65,7 +68,7 @@ START_TEST(scan_char_single_letter) {
   spec.valid = 1;
   spec.var = VAR_CHAR;
   spec.val = 'c';
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq((unsigned char)got, (unsigned char)ref);
@@ -83,7 +86,7 @@ START_TEST(scan_char_digit) {
   spec.valid = 1;
   spec.var = VAR_CHAR;
   spec.val = 'c';
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq((unsigned char)got, (unsigned char)ref);
@@ -101,7 +104,7 @@ START_TEST(scan_char_space) {
   spec.valid = 1;
   spec.var = VAR_CHAR;
   spec.val = 'c';
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq((unsigned char)got, (unsigned char)ref);
@@ -118,7 +121,7 @@ START_TEST(scan_char_null_byte) {
   spec.valid = 1;
   spec.var = VAR_CHAR;
   spec.val = 'c';
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq((unsigned char)got, (unsigned char)'\0');
@@ -136,7 +139,7 @@ START_TEST(scan_char_consumes_one) {
   spec.valid = 1;
   spec.var = VAR_CHAR;
   spec.val = 'c';
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq((unsigned char)got, (unsigned char)ref);
@@ -157,7 +160,7 @@ START_TEST(scan_decimal_d_positive) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -175,7 +178,7 @@ START_TEST(scan_decimal_d_negative) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -193,7 +196,7 @@ START_TEST(scan_decimal_d_plus_prefix) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -211,7 +214,7 @@ START_TEST(scan_decimal_d_zero) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -229,7 +232,7 @@ START_TEST(scan_decimal_d_trailing_garbage) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -248,7 +251,7 @@ START_TEST(scan_decimal_d_width_limits_digits) {
   s21_specifier spec;
   spec_init(&spec, 3, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -267,7 +270,7 @@ START_TEST(scan_decimal_d_width_one) {
   s21_specifier spec;
   spec_init(&spec, 1, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -287,7 +290,7 @@ START_TEST(scan_decimal_d_len_short) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_SHORT, 'd');
   short got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq((int)got, (int)ref);
@@ -306,7 +309,7 @@ START_TEST(scan_decimal_d_len_long) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_LONG, 'd');
   long got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq((long)got, (long)ref);
@@ -325,7 +328,7 @@ START_TEST(scan_decimal_d_len_long_long) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_LONG_LONG, 'd');
   long long got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert(got == ref);
@@ -344,7 +347,7 @@ START_TEST(scan_decimal_d_negative_long_long) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_LONG_LONG, 'd');
   long long got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert(got == ref);
@@ -357,7 +360,7 @@ START_TEST(scan_decimal_d_no_digits_after_sign) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   int got = -999;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   /* No digits: we must not overwrite param. Our impl consumes '+'. */
@@ -371,7 +374,7 @@ START_TEST(scan_decimal_d_empty_string) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   int got = -999;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_ptr_eq(next, input);
@@ -385,7 +388,7 @@ START_TEST(scan_decimal_d_width_zero) {
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   spec.width = 0;
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_ptr_eq(next, input);
@@ -406,7 +409,7 @@ START_TEST(scan_decimal_u_positive) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'u');
   unsigned int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_uint_eq(got, ref);
@@ -425,7 +428,7 @@ START_TEST(scan_decimal_u_zero) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'u');
   unsigned int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_uint_eq(got, ref);
@@ -444,7 +447,7 @@ START_TEST(scan_decimal_u_plus_prefix) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'u');
   unsigned int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_uint_eq(got, ref);
@@ -463,7 +466,7 @@ START_TEST(scan_decimal_u_width) {
   s21_specifier spec;
   spec_init(&spec, 2, LEN_DEFAULT, 'u');
   unsigned int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_uint_eq(got, ref);
@@ -483,7 +486,7 @@ START_TEST(scan_decimal_u_len_short) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_SHORT, 'u');
   unsigned short got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_uint_eq((unsigned int)got, (unsigned int)ref);
@@ -502,7 +505,7 @@ START_TEST(scan_decimal_u_len_long) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_LONG, 'u');
   unsigned long got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert(got == ref);
@@ -521,7 +524,7 @@ START_TEST(scan_decimal_u_len_long_long) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_LONG_LONG, 'u');
   unsigned long long got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert(got == ref);
@@ -534,7 +537,7 @@ START_TEST(scan_decimal_u_empty) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'u');
   unsigned int got = 999;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_ptr_eq(next, input);
@@ -549,7 +552,7 @@ START_TEST(scan_decimal_d_large_width) {
   s21_specifier spec;
   spec_init(&spec, NO_WIDTH_SENTINEL, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   int ref = 0, n = 0;
@@ -569,7 +572,7 @@ START_TEST(scan_decimal_d_negative_with_width) {
   s21_specifier spec;
   spec_init(&spec, 4, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -583,7 +586,7 @@ START_TEST(scan_decimal_d_single_zero) {
   s21_specifier spec;
   spec_init(&spec, 1, LEN_DEFAULT, 'd');
   int got = -1;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, 0);
@@ -601,7 +604,7 @@ START_TEST(scan_decimal_d_minus_zero) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -619,7 +622,7 @@ START_TEST(scan_decimal_d_width_larger_than_input) {
   s21_specifier spec;
   spec_init(&spec, 10, LEN_DEFAULT, 'd');
   int got = 0;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, ref);
@@ -633,7 +636,7 @@ START_TEST(scan_decimal_d_minus_only) {
   s21_specifier spec;
   spec_init(&spec, 0, LEN_DEFAULT, 'd');
   int got = -999;
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, -999);
@@ -651,7 +654,7 @@ START_TEST(scan_char_special) {
   spec.valid = 1;
   spec.var = VAR_CHAR;
   spec.val = 'c';
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq((unsigned char)got, (unsigned char)ref);
@@ -669,7 +672,7 @@ START_TEST(scan_char_newline) {
   spec.valid = 1;
   spec.var = VAR_CHAR;
   spec.val = 'c';
-  ScanState state = {&spec, input, &got};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq((unsigned char)got, (unsigned char)ref);
@@ -677,126 +680,145 @@ START_TEST(scan_char_newline) {
 }
 END_TEST
 
-/* ---- VAR_FLOAT (stub: no consume, no overwrite) ---- */
+/* ---- VAR_FLOAT ---- */
 
-START_TEST(scan_float_f_stub_no_advance) {
+START_TEST(scan_float_f) {
   const char* input = "3.14";
-  float dummy = -99.9f;
+  double ref = 0.0, got = -99.9;
+  int n = 0;
+  sscanf(input, "%lf%n", &ref, &n);
+
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'f';
-  ScanState state = {&spec, input, &dummy};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert(dummy == -99.9f);
+  ck_assert_double_eq_tol(got, ref, 1e-9);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-START_TEST(scan_float_e_stub) {
+START_TEST(scan_float_e) {
   const char* input = "1e-10";
-  double dummy = 77.7;
+  double ref = 0.0, got = 77.7;
+  int n = 0;
+  sscanf(input, "%le%n", &ref, &n);
+
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'e';
-  ScanState state = {&spec, input, &dummy};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert(dummy == 77.7);
+  ck_assert_double_eq_tol(got, ref, 1e-15);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-START_TEST(scan_float_g_stub) {
+START_TEST(scan_float_g) {
   const char* input = "1.5";
-  double dummy = 0.0;
+  double ref = 0.0, got = 0.0;
+  int n = 0;
+  sscanf(input, "%lg%n", &ref, &n);
+
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'g';
-  ScanState state = {&spec, input, &dummy};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert(dummy == 0.0);
+  ck_assert_double_eq_tol(got, ref, 1e-9);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-START_TEST(scan_float_E_stub) {
+START_TEST(scan_float_E) {
   const char* input = "2E+3";
-  double dummy = -1.0;
+  double ref = 0.0, got = -1.0;
+  int n = 0;
+  sscanf(input, "%lE%n", &ref, &n);
+
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'E';
-  ScanState state = {&spec, input, &dummy};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert(dummy == -1.0);
+  ck_assert_double_eq_tol(got, ref, 1e-9);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-START_TEST(scan_float_G_stub) {
-  const char* input = "0.5G";
-  double dummy = 123.456;
+START_TEST(scan_float_G) {
+  const char* input = "0.5";
+  double ref = 0.0, got = 123.456;
+  int n = 0;
+  sscanf(input, "%lG%n", &ref, &n);
+
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'G';
-  ScanState state = {&spec, input, &dummy};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert(dummy == 123.456);
+  ck_assert_double_eq_tol(got, ref, 1e-9);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-START_TEST(scan_float_long_double_stub) {
+START_TEST(scan_float_long_double) {
   const char* input = "1.5";
-  long double dummy = 99.0L;
+  long double ref = 0.0L, got = 99.0L;
+  int n = 0;
+  sscanf(input, "%Lf%n", &ref, &n);
+
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'f';
   spec.len = LEN_LONG_DOUBLE;
-  ScanState state = {&spec, input, &dummy};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert(dummy == 99.0L);
+  ck_assert(got == ref);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-/* ---- VAR_STRING (stub) ---- */
+/* ---- VAR_STRING ---- */
 
-START_TEST(scan_string_stub_no_advance) {
+START_TEST(scan_string_basic) {
   const char* input = "hello";
-  char buf[32];
-  memset(buf, 0xAB, sizeof(buf));
-  buf[31] = '\0';
+  char ref[32] = {0}, buf[32] = {0};
+  int n = 0;
+  sscanf(input, "%31s%n", ref, &n);
+
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_STRING;
   spec.val = 's';
-  ScanState state = {&spec, input, buf};
+  ScanState state = {&spec, input, input, buf};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert_uint_eq((unsigned char)buf[0], 0xABu);
+  ck_assert_str_eq(buf, ref);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-START_TEST(scan_string_stub_empty_input) {
+START_TEST(scan_string_empty_input) {
   const char* input = "";
   char buf[8] = "xyz";
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_STRING;
   spec.val = 's';
-  ScanState state = {&spec, input, buf};
+  ScanState state = {&spec, input, input, buf};
   const char* next = scan_string_var(&state);
 
   ck_assert_ptr_eq(next, input);
@@ -804,8 +826,12 @@ START_TEST(scan_string_stub_empty_input) {
 }
 END_TEST
 
-START_TEST(scan_string_stub_with_width) {
+START_TEST(scan_string_with_width) {
   const char* input = "abc";
+  char ref[8] = "!!";
+  int n = 0;
+  sscanf(input, "%2s%n", ref, &n);
+
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_STRING;
@@ -813,107 +839,114 @@ START_TEST(scan_string_stub_with_width) {
   spec.has_width = 1;
   spec.width = 2;
   char buf[8] = "!!";
-  ScanState state = {&spec, input, buf};
+  ScanState state = {&spec, input, input, buf};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert_str_eq(buf, "!!");
+  ck_assert_str_eq(buf, ref);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-/* ---- VAR_NREAD (stub) ---- */
+/* ---- VAR_NREAD ---- */
 
-START_TEST(scan_nread_stub_no_advance) {
+START_TEST(scan_nread_zero) {
   const char* input = "foo";
   int n = -999;
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_NREAD;
   spec.val = 'n';
-  ScanState state = {&spec, input, &n};
+  ScanState state = {&spec, input, input, &n};
   const char* next = scan_string_var(&state);
 
   ck_assert_ptr_eq(next, input);
-  ck_assert_int_eq(n, -999);
+  ck_assert_int_eq(n, 0);
 }
 END_TEST
 
-START_TEST(scan_nread_stub_empty) {
+START_TEST(scan_nread_empty) {
   const char* input = "";
   int n = 42;
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_NREAD;
   spec.val = 'n';
-  ScanState state = {&spec, input, &n};
+  ScanState state = {&spec, input, input, &n};
   const char* next = scan_string_var(&state);
 
   ck_assert_ptr_eq(next, input);
-  ck_assert_int_eq(n, 42);
+  ck_assert_int_eq(n, 0);
 }
 END_TEST
 
-/* ---- VAR_POINTER (stub) ---- */
+/* ---- VAR_POINTER ---- */
 
-START_TEST(scan_pointer_stub_no_advance) {
+START_TEST(scan_pointer_hex) {
   const char* input = "0x1234";
-  void* magic = (void*)0x1234;
-  void* ptr = magic;
+  void* ref = NULL;
+  int n = 0;
+  sscanf(input, "%p%n", &ref, &n);
+
+  void* got = NULL;
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_POINTER;
   spec.val = 'p';
-  ScanState state = {&spec, input, &ptr};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert_ptr_eq(ptr, magic);
+  ck_assert_ptr_eq(got, ref);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-START_TEST(scan_pointer_stub_null_like) {
-  const char* input = "(nil)";
-  void* ptr = NULL;
+START_TEST(scan_pointer_uppercase) {
+  const char* input = "0Xabcd";
+  void* ref = NULL;
+  int n = 0;
+  sscanf(input, "%p%n", &ref, &n);
+
+  void* got = NULL;
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_POINTER;
   spec.val = 'p';
-  ScanState state = {&spec, input, &ptr};
+  ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
-  ck_assert_ptr_null(ptr);
+  ck_assert_ptr_eq(got, ref);
+  ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
-/* ---- VAR_SYMBOL (stub) ---- */
+/* ---- VAR_SYMBOL ---- */
 
-START_TEST(scan_symbol_stub_no_advance) {
+START_TEST(scan_symbol_percent) {
   const char* input = "%";
-  int dummy = 111;
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_SYMBOL;
   spec.val = '%';
-  ScanState state = {&spec, input, &dummy};
+  int dummy = 111;
+  ScanState state = {&spec, input, input, &dummy};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
+  ck_assert_ptr_eq(next, input + 1);
   ck_assert_int_eq(dummy, 111);
 }
 END_TEST
 
-START_TEST(scan_symbol_stub_percent_then_more) {
+START_TEST(scan_symbol_percent_then_more) {
   const char* input = "%%x";
-  char dummy = '?';
   s21_specifier spec = {};
   spec.valid = 1;
   spec.var = VAR_SYMBOL;
   spec.val = '%';
-  ScanState state = {&spec, input, &dummy};
+  char dummy = '?';
+  ScanState state = {&spec, input, input, &dummy};
   const char* next = scan_string_var(&state);
 
-  ck_assert_ptr_eq(next, input);
+  ck_assert_ptr_eq(next, input + 1);
   ck_assert_int_eq((unsigned char)dummy, (unsigned char)'?');
 }
 END_TEST
@@ -966,33 +999,33 @@ static Suite* scan_suite(void) {
   suite_add_tcase(s, tc_u);
 
   TCase* tc_float = tcase_create("float");
-  tcase_add_test(tc_float, scan_float_f_stub_no_advance);
-  tcase_add_test(tc_float, scan_float_e_stub);
-  tcase_add_test(tc_float, scan_float_g_stub);
-  tcase_add_test(tc_float, scan_float_E_stub);
-  tcase_add_test(tc_float, scan_float_G_stub);
-  tcase_add_test(tc_float, scan_float_long_double_stub);
+  tcase_add_test(tc_float, scan_float_f);
+  tcase_add_test(tc_float, scan_float_e);
+  tcase_add_test(tc_float, scan_float_g);
+  tcase_add_test(tc_float, scan_float_E);
+  tcase_add_test(tc_float, scan_float_G);
+  tcase_add_test(tc_float, scan_float_long_double);
   suite_add_tcase(s, tc_float);
 
   TCase* tc_string = tcase_create("string");
-  tcase_add_test(tc_string, scan_string_stub_no_advance);
-  tcase_add_test(tc_string, scan_string_stub_empty_input);
-  tcase_add_test(tc_string, scan_string_stub_with_width);
+  tcase_add_test(tc_string, scan_string_basic);
+  tcase_add_test(tc_string, scan_string_empty_input);
+  tcase_add_test(tc_string, scan_string_with_width);
   suite_add_tcase(s, tc_string);
 
   TCase* tc_nread = tcase_create("nread");
-  tcase_add_test(tc_nread, scan_nread_stub_no_advance);
-  tcase_add_test(tc_nread, scan_nread_stub_empty);
+  tcase_add_test(tc_nread, scan_nread_zero);
+  tcase_add_test(tc_nread, scan_nread_empty);
   suite_add_tcase(s, tc_nread);
 
   TCase* tc_pointer = tcase_create("pointer");
-  tcase_add_test(tc_pointer, scan_pointer_stub_no_advance);
-  tcase_add_test(tc_pointer, scan_pointer_stub_null_like);
+  tcase_add_test(tc_pointer, scan_pointer_hex);
+  tcase_add_test(tc_pointer, scan_pointer_uppercase);
   suite_add_tcase(s, tc_pointer);
 
   TCase* tc_symbol = tcase_create("symbol");
-  tcase_add_test(tc_symbol, scan_symbol_stub_no_advance);
-  tcase_add_test(tc_symbol, scan_symbol_stub_percent_then_more);
+  tcase_add_test(tc_symbol, scan_symbol_percent);
+  tcase_add_test(tc_symbol, scan_symbol_percent_then_more);
   suite_add_tcase(s, tc_symbol);
 
   return s;
