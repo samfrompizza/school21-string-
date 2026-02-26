@@ -1,7 +1,6 @@
 #include "s21_format.h"
 
 #include <ctype.h>
-#include <stdlib.h>
 
 #include "../string/s21_string.h"
 
@@ -131,7 +130,7 @@ static const char* parse_spec_letter(const char* format, s21_specifier* spec) {
 // Public API
 const char* s21_parse_spec(const char* format, s21_specifier* spec) {
   if (!format) {
-    return NULL;
+    return S21_NULL;
   }
 
   format = parse_flags(format, spec);

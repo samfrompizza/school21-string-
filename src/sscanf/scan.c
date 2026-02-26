@@ -7,18 +7,25 @@
 #include "../common/s21_format.h"
 #include "../string/s21_string.h"
 
-static void copy_bytes(void* dest, const void* src, s21_size n) {
-  unsigned char* d = (unsigned char*)dest;
-  const unsigned char* s = (const unsigned char*)src;
-  for (s21_size i = 0; i < n; i++) {
-    d[i] = s[i];
-  }
-}
-
 #define WIDTH_UNLIMITED 8192
 
+/* Helper: get effective scan width from specifier */
+static int get_width(const s21_specifier* spec) {
+  return spec->has_width && spec->width > 0 ? spec->width : WIDTH_UNLIMITED;
+}
+
+/* Helper: advance p past leading whitespace */
+static const char* skip_whitespace(const char* p) {
+  while (*p && isspace((unsigned char)*p)) {
+    p++;
+  }
+  return p;
+}
+
 /* Returns 1 if ch is octal digit */
-static int isoctal(int ch) { return ch >= '0' && ch <= '7'; }
+static int isoctal(int ch) {
+  return ch >= '0' && ch <= '7';
+}
 
 /* Returns 1 if ch is hex digit */
 static int isxdigit_custom(int ch) {
@@ -84,17 +91,75 @@ static const char* scan_char(ScanState* state) {
       state->spec->has_width && state->spec->width > 0 ? state->spec->width : 1;
   s21_size n = (s21_size)width;
   if (n > 0) {
-    copy_bytes(state->param, state->str, n);
+    s21_memcpy(state->param, state->str, n);
     return state->str + n;
   }
   return state->str;
 }
 
-static const char* scan_decimal(ScanState* state) {
-  const char* p = state->str;
-  while (*p && isspace((unsigned char)*p)) {
-    p++;
+/* Parses base (10/8/16) and optional 0x prefix for %i, %o, %x. */
+static void decimal_parse_prefix(const char** p_out, int* width_left,
+                                 char spec_val, int* base, int* allow_sign) {
+  const char* p = *p_out;
+
+  if (spec_val == 'i') {
+    if (*width_left >= 2 && p[0] == '0' && (p[1] == 'x' || p[1] == 'X')) {
+      *base = 16;
+      p += 2;
+      *width_left -= 2;
+      *allow_sign = 0;
+    } else if (*width_left >= 1 && p[0] == '0') {
+      *base = 8;
+      *allow_sign = 0;
+    }
+  } else if (spec_val == 'o') {
+    *base = 8;
+    *allow_sign = 0;
+  } else if (spec_val == 'x' || spec_val == 'X') {
+    if (*width_left >= 2 && p[0] == '0' && (p[1] == 'x' || p[1] == 'X')) {
+      p += 2;
+      *width_left -= 2;
+    }
+    *base = 16;
+    *allow_sign = 0;
   }
+
+  *p_out = p;
+}
+
+/* Parses decimal digits in given base, returns value and updates p/width_left.
+ */
+static unsigned long long
+decimal_parse_digits(const char** p_out, int* width_left, int base) {
+  const char* p = *p_out;
+  unsigned long long value = 0;
+
+  if (base == 10) {
+    while (*width_left > 0 && *p && isdigit(*p)) {
+      value = value * 10 + (unsigned long long)(*p - '0');
+      p++;
+      (*width_left)--;
+    }
+  } else if (base == 8) {
+    while (*width_left > 0 && *p && isoctal(*p)) {
+      value = value * 8 + (unsigned long long)(*p - '0');
+      p++;
+      (*width_left)--;
+    }
+  } else {
+    while (*width_left > 0 && *p && isxdigit_custom(*p)) {
+      value = value * 16 + (unsigned long long)xdigit_value(*p);
+      p++;
+      (*width_left)--;
+    }
+  }
+
+  *p_out = p;
+  return value;
+}
+
+static const char* scan_decimal(ScanState* state) {
+  const char* p = skip_whitespace(state->str);
 
   int width_left =
       state->spec->has_width ? state->spec->width : WIDTH_UNLIMITED;
@@ -106,27 +171,7 @@ static const char* scan_decimal(ScanState* state) {
   int base = 10;
   int allow_sign = 1;
 
-  if (state->spec->val == 'i') {
-    if (width_left >= 2 && p[0] == '0' && (p[1] == 'x' || p[1] == 'X')) {
-      base = 16;
-      p += 2;
-      width_left -= 2;
-      allow_sign = 0;
-    } else if (width_left >= 1 && p[0] == '0') {
-      base = 8;
-      allow_sign = 0;
-    }
-  } else if (state->spec->val == 'o') {
-    base = 8;
-    allow_sign = 0;
-  } else if (state->spec->val == 'x' || state->spec->val == 'X') {
-    if (width_left >= 2 && p[0] == '0' && (p[1] == 'x' || p[1] == 'X')) {
-      p += 2;
-      width_left -= 2;
-    }
-    base = 16;
-    allow_sign = 0;
-  }
+  decimal_parse_prefix(&p, &width_left, state->spec->val, &base, &allow_sign);
 
   if (allow_sign && width_left > 0 && (*p == '+' || *p == '-')) {
     sign = (*p == '-') ? -1 : 1;
@@ -134,31 +179,9 @@ static const char* scan_decimal(ScanState* state) {
     width_left--;
   }
 
-  unsigned long long value = 0;
-  int parsed = 0;
-
-  if (base == 10) {
-    while (width_left > 0 && *p && isdigit(*p)) {
-      value = value * 10 + (unsigned long long)(*p - '0');
-      p++;
-      width_left--;
-      parsed = 1;
-    }
-  } else if (base == 8) {
-    while (width_left > 0 && *p && isoctal(*p)) {
-      value = value * 8 + (unsigned long long)(*p - '0');
-      p++;
-      width_left--;
-      parsed = 1;
-    }
-  } else {
-    while (width_left > 0 && *p && isxdigit_custom(*p)) {
-      value = value * 16 + (unsigned long long)xdigit_value(*p);
-      p++;
-      width_left--;
-      parsed = 1;
-    }
-  }
+  const char* start = p;
+  unsigned long long value = decimal_parse_digits(&p, &width_left, base);
+  int parsed = (p != start);
 
   if (!parsed) {
     if (p != state->str) {
@@ -196,8 +219,8 @@ static void assign_signed_decimal(ScanState* state, long long value) {
   }
 }
 
-static void assign_unsigned_decimal(ScanState* state,
-                                    unsigned long long value) {
+static void
+assign_unsigned_decimal(ScanState* state, unsigned long long value) {
   switch (state->spec->len) {
     case LEN_DEFAULT:
       *(unsigned int*)(state->param) = (unsigned int)value;
@@ -219,15 +242,9 @@ static void assign_unsigned_decimal(ScanState* state,
 #define FLOAT_BUF_SIZE 512
 
 static const char* scan_float(ScanState* state) {
-  const char* p = state->str;
-  while (*p && isspace((unsigned char)*p)) {
-    p++;
-  }
-  state->str = p;
+  state->str = skip_whitespace(state->str);
 
-  int width_left = state->spec->has_width && state->spec->width > 0
-                       ? state->spec->width
-                       : WIDTH_UNLIMITED;
+  int width_left = get_width(state->spec);
   if (width_left <= 0 || !*state->str) {
     return state->str;
   }
@@ -242,7 +259,7 @@ static const char* scan_float(ScanState* state) {
   while (i < n && src[i]) {
     i++;
   }
-  copy_bytes(buf, src, i);
+  s21_memcpy(buf, src, i);
   buf[i] = '\0';
 
   char* end = (char*)(uintptr_t)0;
@@ -262,14 +279,9 @@ static const char* scan_float(ScanState* state) {
 }
 
 static const char* scan_string(ScanState* state) {
-  const char* p = state->str;
-  while (*p && isspace((unsigned char)*p)) {
-    p++;
-  }
+  const char* p = skip_whitespace(state->str);
 
-  int width_left = state->spec->has_width && state->spec->width > 0
-                       ? state->spec->width
-                       : WIDTH_UNLIMITED;
+  int width_left = get_width(state->spec);
   if (width_left <= 0 || !*p) {
     return state->str;
   }
@@ -311,14 +323,9 @@ static const char* scan_nread(ScanState* state) {
 }
 
 static const char* scan_pointer(ScanState* state) {
-  const char* p = state->str;
-  while (*p && isspace((unsigned char)*p)) {
-    p++;
-  }
+  const char* p = skip_whitespace(state->str);
 
-  int width_left = state->spec->has_width && state->spec->width > 0
-                       ? state->spec->width
-                       : WIDTH_UNLIMITED;
+  int width_left = get_width(state->spec);
   if (width_left >= 2 && p[0] == '0' && (p[1] == 'x' || p[1] == 'X')) {
     p += 2;
     width_left -= 2;

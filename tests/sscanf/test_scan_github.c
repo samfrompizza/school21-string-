@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../../src/string/s21_string.h"
 #include "../../src/sscanf/scan.h"
+#include "../../src/string/s21_string.h"
 
 Suite* suite_atoi(void);
 Suite* suite_sprintf(void);

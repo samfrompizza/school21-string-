@@ -1,7 +1,7 @@
 #ifndef S_21_STRING_H_
 #define S_21_STRING_H_
 
-#define s21_NULL ((void*)0);
+#define S21_NULL ((void*)0)
 
 typedef unsigned long long s21_size;
 
