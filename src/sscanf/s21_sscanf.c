@@ -5,21 +5,16 @@
 #include "../common/s21_format.h"
 #include "../string/s21_string.h"
 #include "scan.h"
+#include "../common/s21_parse_helpers.h"
 
 #define DUMMY_SIZE 64
 
-/* Skips whitespace in format and input. Advances both pointers. */
 static inline void
 sscanf_skip_whitespace(const char** format_p, const char** str_p) {
-  while (**format_p && isspace((unsigned char)**format_p)) {
-    (*format_p)++;
-  }
-  while (**str_p && isspace((unsigned char)**str_p)) {
-    (*str_p)++;
-  }
+  s21_skip_whitespace(format_p);
+  s21_skip_whitespace(str_p);
 }
 
-/* Matches one literal (non-%) format char. Returns 1 on match, 0 on failure. */
 static inline int
 sscanf_match_literal(const char** format_p, const char** str_p) {
   if (**str_p != **format_p) {
@@ -30,7 +25,6 @@ sscanf_match_literal(const char** format_p, const char** str_p) {
   return 1;
 }
 
-/* Processes one % specifier. Returns 0 to continue loop, -1 to break. */
 static int sscanf_process_spec(const char** format_p, const char** str_p,
                                const char* str_start, va_list* args,
                                int* assigned) {
