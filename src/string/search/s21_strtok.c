@@ -1,18 +1,5 @@
 #include "../s21_string.h"
 
-static int s21_is_delimiter(char c, const char* delimiters) {
-  int result = 0;
-
-  for (const char* delim_ptr = delimiters; *delim_ptr != '\0' && !result;
-       ++delim_ptr) {
-    if (c == *delim_ptr) {
-      result = 1;
-    }
-  }
-
-  return result;
-}
-
 char* s21_strtok(char* str, const char* delimiters) {
   static char* saved_position = S21_NULL;
   char* found_token = S21_NULL;
@@ -29,7 +16,7 @@ char* s21_strtok(char* str, const char* delimiters) {
   }
 
   for (; *current_pos != '\0' && found_token == S21_NULL; ++current_pos) {
-    if (!s21_is_delimiter(*current_pos, delimiters)) {
+    if (s21_strchr(delimiters, (unsigned char)*current_pos) == S21_NULL) {
       found_token = current_pos;
     }
   }
@@ -38,7 +25,7 @@ char* s21_strtok(char* str, const char* delimiters) {
     int token_detected = 0;
 
     for (; *current_pos != '\0' && !token_detected; ++current_pos) {
-      if (s21_is_delimiter(*current_pos, delimiters)) {
+      if (s21_strchr(delimiters, (unsigned char)*current_pos) != S21_NULL) {
         *current_pos = '\0';
         saved_position = current_pos + 1;
         token_detected = 1;

@@ -1,15 +1,10 @@
 #include "../s21_string.h"
 
 char* s21_strpbrk(const char* str1, const char* str2) {
-  char* result = S21_NULL;
-
-  for (const char* s1 = str1; *s1 != '\0' && result == S21_NULL; ++s1) {
-    for (const char* s2 = str2; *s2 != '\0' && result == S21_NULL; ++s2) {
-      if (*s1 == *s2) {
-        result = (char*)s1;
-      }
+  for (; *str1 != '\0'; ++str1) {
+    if (s21_strchr(str2, (unsigned char)*str1) != S21_NULL) {
+      return (char*)str1;
     }
   }
-
-  return result;
+  return S21_NULL;
 }

@@ -1,19 +1,13 @@
 #include "../s21_string.h"
 
-char* s21_strchr(const char* str, int c) {
-  char* found = S21_NULL;
-  const unsigned char* current = (const unsigned char*)str;
-  unsigned char search_char = (unsigned char)c;
+s21_size s21_strcspn(const char* str1, const char* str2) {
+  s21_size span = 0;
 
-  for (; *current != '\0' && found == S21_NULL; ++current) {
-    if (*current == search_char) {
-      found = (char*)current;
+  for (; str1[span] != '\0'; ++span) {
+    if (s21_strchr(str2, (unsigned char)str1[span]) != S21_NULL) {
+      return span;
     }
   }
 
-  if (found == S21_NULL && search_char == '\0') {
-    found = (char*)current;
-  }
-
-  return found;
+  return span;
 }
