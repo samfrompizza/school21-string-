@@ -12,6 +12,7 @@ static bool s21_contains_char(const char *set, char c) {
   return false;
 }
 
+
 // Helper static functions declaration
 static const char *parse_flags(const char *format, s21_specifier *spec);
 static const char *parse_width(const char *format, s21_specifier *spec);
