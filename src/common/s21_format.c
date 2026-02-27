@@ -51,10 +51,10 @@ static const char *parse_width(const char *format, s21_specifier *spec) {
     spec->width_from_arg = true;
     spec->has_width = true;
     format++;
-  } else if (isdigit(*format)) {
+  } else if (isdigit((unsigned char)*format)) {
     spec->has_width = true;
     spec->width = 0;
-    while (isdigit(*format)) {
+    while (isdigit((unsigned char)*format)) {
       spec->width = spec->width * 10 + (*format - '0');
       format++;
     }
@@ -73,9 +73,9 @@ static const char *parse_precision(const char *format, s21_specifier *spec) {
     if (*format == '*') {
       spec->precision_from_arg = true;
       format++;
-    } else if (isdigit(*format)) {
+    } else if (isdigit((unsigned char)*format)) {
       spec->precision = 0;
-      while (isdigit(*format)) {
+      while (isdigit((unsigned char)*format)) {
         spec->precision = spec->precision * 10 + (*format - '0');
         format++;
       }

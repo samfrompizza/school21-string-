@@ -20,12 +20,13 @@ int s21_sprintf(char *str, const char *format, ...) {
   va_start(ap, format);
 
   const char *fmt = format;
+  char *out = str;
   char *start = str;
 
   while (*fmt != '\0') {
     if (*fmt != '%') {
-      *str = *fmt;
-      str++;
+      *out = *fmt;
+      out++;
       fmt++;
       continue;
     }

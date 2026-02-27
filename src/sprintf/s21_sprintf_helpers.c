@@ -33,11 +33,13 @@ long long get_signed_arg(va_list *ap, s21_specifier spec) {
       break;
   }
 
-  return res;
+static void s21_local_memcpy(char *dst, const char *src, s21_size len) {
+  for (s21_size i = 0; i < len; i++) dst[i] = src[i];
 }
 
-unsigned long long get_unsigned_arg(va_list *ap, s21_specifier spec) {
-  unsigned long long res = 0;
+static int s21_uint_to_base(unsigned long long value, int base, bool upper,
+                            int precision, char *out, s21_size out_size) {
+  if (out == S21_NULL || out_size == 0 || base < 2 || base > 16) return -1;
 
   switch (spec.len) {
     case LEN_SHORT:
@@ -55,11 +57,9 @@ unsigned long long get_unsigned_arg(va_list *ap, s21_specifier spec) {
       break;
   }
 
-  return res;
-}
-
-long double get_float_arg(va_list *ap, s21_specifier spec) {
-  long double res = 0.0L;
+  const char *digits = upper ? "0123456789ABCDEF" : "0123456789abcdef";
+  char rev[S21_INT_BUF] = {0};
+  int len = 0;
 
   switch (spec.len) {
     case LEN_LONG_DOUBLE:
@@ -71,8 +71,7 @@ long double get_float_arg(va_list *ap, s21_specifier spec) {
       break;
   }
 
-  return res;
-}
+  if ((s21_size)len + 1 > out_size) return -1;
 
 void read_width_precision_from_args(s21_specifier *spec, va_list *ap) {
   if (!spec->width_from_arg && !spec->precision_from_arg) return;
@@ -158,7 +157,12 @@ const char *determine_int_prefix(const s21_specifier *spec,
       prefix = "0";
   }
 
-  return prefix;
+  for (int i = precision - 1; i >= 0; i--) {
+    buf[i] = (char)('0' + (fraction % 10ULL));
+    fraction /= 10ULL;
+  }
+  buf[precision] = '\0';
+  return precision;
 }
 
 int pointer_to_hex_str(void *ptr, char *buf, s21_size buf_size) {
@@ -174,7 +178,9 @@ int format_char(char *out_buf, s21_size out_size, int ch,
   int width = spec->has_width ? spec->width : 1;
   if (width < 1) width = 1;
 
-  if ((s21_size)width + 1 > out_size) return -1;
+  if (spec->len == LEN_LONG_DOUBLE) return va_arg(*ap, long double);
+  return (long double)va_arg(*ap, double);
+}
 
   int pad = width - 1;
   int pos = 0;
@@ -197,7 +203,14 @@ int format_string(char *out_buf, s21_size out_size, const char *src,
                   const s21_specifier *spec) {
   if (out_buf == S21_NULL || out_size == 0 || spec == S21_NULL) return -1;
 
+int s21_format_string(char *out_buf, s21_size out_size, const char *src,
+                      const s21_specifier *spec) {
   if (src == S21_NULL) src = "(null)";
+  int len = (int)s21_local_strlen(src);
+  if (spec->has_precision && spec->precision < len) len = spec->precision;
+  return s21_build_with_width(out_buf, out_size, src, len, '\0', "", spec,
+                              false);
+}
 
   s21_size content_len = s21_local_strlen(src);
   if (spec->has_precision && spec->precision >= 0 &&
@@ -208,7 +221,14 @@ int format_string(char *out_buf, s21_size out_size, const char *src,
   int width = spec->has_width ? spec->width : (int)content_len;
   if (width < (int)content_len) width = (int)content_len;
 
-  if ((s21_size)width + 1 > out_size) return -1;
+int s21_format_unsigned(char *out_buf, s21_size out_size,
+                        const s21_specifier *spec, va_list *ap) {
+  if (out_buf == S21_NULL || spec == S21_NULL || ap == S21_NULL) return -1;
+
+  unsigned long long value = s21_get_unsigned_arg(ap, spec);
+  int base = 10;
+  bool upper = false;
+  const char *prefix = "";
 
   int pad = width - (int)content_len;
   int pos = 0;
@@ -247,7 +267,11 @@ int apply_integer_format(char *out_buf, s21_size out_size, const char *digits,
   int width = spec->has_width ? spec->width : raw_len;
   if (width < raw_len) width = raw_len;
 
-  if ((s21_size)width + 1 > out_size) return -1;
+  if (isnan(value)) {
+    const char *txt = "nan";
+    return s21_build_with_width(out_buf, out_size, txt, 3, sign_char, "", spec,
+                                false);
+  }
 
   int pad_len = width - raw_len;
   bool use_zero_pad = spec->flags.zero_pad && !spec->flags.left_align && !spec->has_precision;
