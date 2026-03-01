@@ -1,19 +1,22 @@
 #include "../s21_string.h"
 
-char* s21_strchr(const char* str, int c) {
-  char* found = S21_NULL;
-  const unsigned char* current = (const unsigned char*)str;
-  unsigned char search_char = (unsigned char)c;
+s21_size s21_strcspn(const char* str1, const char* str2) {
+  s21_size length = 0;
+  const char* str1_ptr = str1;
+  const char* str2_ptr = S21_NULL;
+  int found = 0;
 
-  for (; *current != '\0' && found == S21_NULL; ++current) {
-    if (*current == search_char) {
-      found = (char*)current;
+  for (; *str1_ptr != '\0' && !found; ++str1_ptr) {
+    for (str2_ptr = str2; *str2_ptr != '\0' && !found; ++str2_ptr) {
+      if (*str1_ptr == *str2_ptr) {
+        found = 1;
+      }
+    }
+
+    if (!found) {
+      ++length;
     }
   }
 
-  if (found == S21_NULL && search_char == '\0') {
-    found = (char*)current;
-  }
-
-  return found;
+  return length;
 }
