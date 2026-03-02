@@ -1,33 +1,50 @@
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -O2 -g --std=gnu11
+CFLAGS = -Wall -Werror -Wextra -std=c11
+GCOV_FLAGS = -fprofile-arcs -ftest-coverage
 
-SRC_SPRINTF = $(shell find sprintf common -name '*.c')
-OBJ_SPRINTF = $(patsubst %.c,build/%.o,$(SRC_SPRINTF))
-TEST_SPRINTF = ../tests/sprintf/test_sprintf.c
-TEST_OBJ = build/tests/sprintf/test_sprintf.o
+UNAME := $(shell uname -s)
+ifeq ($(UNAME),Linux)
+  TEST_LIBS = -lcheck -lm -lpthread -lrt -lsubunit
+else
+  TEST_LIBS = -lcheck -lm
+endif
 
-LIB = s21_string.a
+BUILD_DIR = build
+LIB_NAME = s21_string.a
 
-.PHONY: all clean test test_sprintf
+COMMON_SRCS = common/s21_format.c
+SPRINTF_SRCS = sprintf/s21_sprintf.c sprintf/s21_sprintf_helpers.c
+SRCS = $(COMMON_SRCS) $(SPRINTF_SRCS)
+OBJS = $(patsubst %.c,$(BUILD_DIR)/%.o,$(SRCS))
 
-all: $(LIB)
+TEST_SPRINTF_SRC = ../tests/sprintf/test_sprintf.c
+TEST_SPRINTF_OBJ = $(BUILD_DIR)/tests/sprintf/test_sprintf.o
 
-$(LIB): $(OBJ_SPRINTF)
-	ar rcs $@ $^
+.PHONY: all clean test gcov_report s21_string.a
 
-build/%.o: %.c
+all: s21_string.a
+
+s21_string.a: $(OBJS)
+	ar rcs $(LIB_NAME) $(OBJS)
+
+$(BUILD_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(TEST_OBJ): $(TEST_SPRINTF)
+$(TEST_SPRINTF_OBJ): $(TEST_SPRINTF_SRC)
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-test_sprintf: $(LIB) $(TEST_OBJ)
-	$(CC) $(CFLAGS) $(TEST_OBJ) $(LIB) -o test_sprintf
+test: s21_string.a $(TEST_SPRINTF_OBJ)
+	$(CC) $(CFLAGS) $(TEST_SPRINTF_OBJ) $(LIB_NAME) -o test_sprintf $(TEST_LIBS)
 	./test_sprintf
 
-test: test_sprintf
+gcov_report: CFLAGS += $(GCOV_FLAGS)
+gcov_report: clean s21_string.a $(TEST_SPRINTF_OBJ)
+	$(CC) $(CFLAGS) $(TEST_SPRINTF_OBJ) $(LIB_NAME) -o test_sprintf_gcov $(TEST_LIBS)
+	./test_sprintf_gcov
+	lcov -t "s21_sprintf" -o gcov_report.info -c -d .
+	genhtml -o report gcov_report.info
 
 clean:
-	rm -rf build $(LIB) test_sprintf
+	rm -rf $(BUILD_DIR) $(LIB_NAME) test_sprintf test_sprintf_gcov *.gcda *.gcno gcov_report.info report
