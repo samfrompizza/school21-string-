@@ -12,35 +12,35 @@ TEST_DIR = tests
 BUILD_DIR = build
 
 # sources
-STRING_SRCS := $(wildcard src/string/**/*.c)
-SSCANF_SRCS := $(wildcard src/sscanf/**/*.c)
-SPRINTF_SRCS := $(wildcard src/sprintf/**/*.c)
-EXTRA_SRCS := $(wildcard src/extra/**/*.c)
-COMMON_SRCS := $(wildcard src/common/**/*.c)
+STRING_SRCS := $(wildcard $(SRC_DIR)/string/**/*.c)
+SSCANF_SRCS := $(wildcard $(SRC_DIR)/sscanf/**/*.c)
+SPRINTF_SRCS := $(wildcard $(SRC_DIR)/sprintf/**/*.c)
+EXTRA_SRCS := $(wildcard $(SRC_DIR)/extra/**/*.c)
+COMMON_SRCS := $(wildcard $(SRC_DIR)/common/**/*.c)
 SRCS := $(COMMON_SRCS) $(STRING_SRCS) $(SSCANF_SRCS) $(SPRINTF_SRCS) $(EXTRA_SRCS)
 
 # objects
-STRING_OBJS := $(patsubst src/%.c, build/%.o, $(STRING_SRCS))
-SSCANF_OBJS := $(patsubst src/%.c, build/%.o, $(SSCANF_SRCS))
-SPRINTF_OBJS := $(patsubst src/%.c, build/%.o, $(SPRINTF_SRCS))
-EXTRA_OBJS := $(patsubst src/%.c, build/%.o, $(EXTRA_SRCS))
-COMMON_OBJS := $(patsubst src/%.c, build/%.o, $(COMMON_SRCS))
+STRING_OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(STRING_SRCS))
+SSCANF_OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SSCANF_SRCS))
+SPRINTF_OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SPRINTF_SRCS))
+EXTRA_OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(EXTRA_SRCS))
+COMMON_OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(COMMON_SRCS))
 OBJS := $(COMMON_OBJS) $(STRING_OBJS) $(SSCANF_OBJS) $(SPRINTF_OBJS) $(EXTRA_OBJS)
 
 STRING_LIB = s21_string.a
 
 # ==== TEST SOURCES ====
-TEST_STRING_SRCS := $(wildcard tests/string/**/*.c)
-TEST_SSCANF_SRCS := $(wildcard tests/sscanf/**/*.c)
-TEST_SPRINTF_SRCS := $(wildcard tests/sprintf/**/*.c)
-TEST_EXTRA_SRCS := $(wildcard tests/extra/**/*.c)
-TEST_COMMON_SRCS := $(wildcard tests/common/**/*.c)
+TEST_STRING_SRCS := $(wildcard $(TEST_DIR)/string/**/*.c)
+TEST_SSCANF_SRCS := $(wildcard $(TEST_DIR)/sscanf/**/*.c)
+TEST_SPRINTF_SRCS := $(wildcard $(TEST_DIR)/sprintf/**/*.c)
+TEST_EXTRA_SRCS := $(wildcard $(TEST_DIR)/extra/**/*.c)
+TEST_COMMON_SRCS := $(wildcard $(TEST_DIR)/common/**/*.c)
 
-TEST_STRING_OBJS := $(patsubst tests/%.c, build/%.o, $(TEST_STRING_SRCS))
-TEST_SSCANF_OBJS := $(patsubst tests/%.c, build/%.o, $(TEST_SSCANF_SRCS))
-TEST_SPRINTF_OBJS := $(patsubst tests/%.c, build/%.o, $(TEST_SPRINTF_SRCS))
-TEST_EXTRA_OBJS := $(patsubst tests/%.c, build/%.o, $(TEST_EXTRA_SRCS))
-TEST_COMMON_OBJS := $(patsubst tests/%.c, build/%.o, $(TEST_COMMON_SRCS))
+TEST_STRING_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_STRING_SRCS))
+TEST_SSCANF_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_SSCANF_SRCS))
+TEST_SPRINTF_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_SPRINTF_SRCS))
+TEST_EXTRA_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_EXTRA_SRCS))
+TEST_COMMON_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_COMMON_SRCS))
 
 # ==== TOOLS ====
 FORMATER = clang-format
@@ -66,28 +66,28 @@ all: $(STRING_LIB)
 $(STRING_LIB): $(OBJS)
 	ar rcs $@ $^
 
-$(BUILD_DIR)/%.o: src/%.c
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: tests/%.c
+$(BUILD_DIR)/%.o: $(TEST_DIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # ==== TEST TARGETS ====
-test_string: build/tests/string/test_string.o $(TEST_COMMON_OBJS) $(STRING_LIB)
+test_string: $(BUILD_DIR)/tests/string/test_string.o $(TEST_COMMON_OBJS) $(STRING_LIB)
 	$(CC) $(CFLAGS) $^ -o test_string $(TEST_LIBS)
 	./test_string
 
-test_sscanf: build/tests/sscanf/test_sscanf.o $(TEST_COMMON_OBJS) $(STRING_LIB)
+test_sscanf: $(BUILD_DIR)/tests/sscanf/test_sscanf.o $(TEST_COMMON_OBJS) $(STRING_LIB)
 	$(CC) $(CFLAGS) $^ -o test_sscanf $(TEST_LIBS)
 	./test_sscanf
 
-test_sprintf: build/tests/sprintf/test_sprintf.o $(TEST_COMMON_OBJS) $(STRING_LIB)
+test_sprintf: $(BUILD_DIR)/tests/sprintf/test_sprintf.o $(TEST_COMMON_OBJS) $(STRING_LIB)
 	$(CC) $(CFLAGS) $^ -o test_sprintf $(TEST_LIBS)
 	./test_sprintf
 
-test_extra: build/tests/extra/test_extra.o $(TEST_COMMON_OBJS) $(STRING_LIB)
+test_extra: $(BUILD_DIR)/tests/extra/test_extra.o $(TEST_COMMON_OBJS) $(STRING_LIB)
 	$(CC) $(CFLAGS) $^ -o test_extra $(TEST_LIBS)
 	./test_extra
 
