@@ -81,6 +81,14 @@ static void assert_long_double(const char *fmt, long double value) {
   ck_assert_int_eq(got_n, exp_n);
 }
 
+static void assert_wildcard_width_long_double(const char *fmt, int width,
+                                              long double value) {
+  char got[BUF_SZ] = {0}, exp[BUF_SZ] = {0};
+  int got_n = s21_sprintf(got, fmt, width, value);
+  int exp_n = sprintf(exp, fmt, width, value);
+  ck_assert_int_eq(got_n, exp_n);
+}
+
 static void assert_char(const char *fmt, char value) {
   char got[BUF_SZ] = {0}, exp[BUF_SZ] = {0};
   int got_n = s21_sprintf(got, fmt, value);
@@ -208,7 +216,7 @@ START_TEST(test_float_fixed_and_lengths) {
 
   assert_long_double("%Lf", 1.234567890123456789L);
   assert_long_double("%20.10Lf", 1.234567890123456789L);
-  assert_long_double("%+0*.2Lf", 8L);
+  assert_wildcard_width_long_double("%+0*.2Lf", 8, 8.0L);
 }
 END_TEST
 
