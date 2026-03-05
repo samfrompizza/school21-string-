@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Werror -Wextra -std=c11
-INCLUDES = -I. -Istring string/s21_string.h sprintf/s21_sprintf.h sprintf/s21_sprintf_helpers.h
+INCLUDES = -I. -Istring
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
