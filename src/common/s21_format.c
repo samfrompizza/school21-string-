@@ -3,16 +3,6 @@
 #include <ctype.h>
 #include <stddef.h>
 
-static bool s21_contains_char(const char *set, char c) {
-  if (set == NULL) return false;
-  while (*set != '\0') {
-    if (*set == c) return true;
-    set++;
-  }
-  return false;
-}
-
-
 // Helper static functions declaration
 static const char *parse_flags(const char *format, s21_specifier *spec);
 static const char *parse_width(const char *format, s21_specifier *spec);
@@ -108,14 +98,14 @@ static const char *parse_length(const char *format, s21_specifier *spec) {
 }
 
 static const char *parse_spec_letter(const char *format, s21_specifier *spec) {
-  spec->valid = true;  // Single responsibility??
+  spec->valid = true;
   spec->val = *format;
 
   if (*format == 'c')
     spec->var = VAR_CHAR;
-  else if (s21_contains_char("diouxX", *format))
+  else if (s21_strchr("diouxX", *format))
     spec->var = VAR_DECIMAL;
-  else if (s21_contains_char("eEfgG", *format))
+  else if (s21_strchr("eEfgG", *format))
     spec->var = VAR_FLOAT;
   else if (*format == 's')
     spec->var = VAR_STRING;

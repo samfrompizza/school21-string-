@@ -4,17 +4,6 @@
 #include <math.h>
 #include <stdint.h>
 
-static s21_size s21_local_strlen(const char *src) {
-  s21_size len = 0;
-  if (src == S21_NULL) return 0;
-  while (src[len] != '\0') len++;
-  return len;
-}
-
-static void s21_local_memcpy(char *dst, const char *src, s21_size len) {
-  for (s21_size i = 0; i < len; i++) dst[i] = src[i];
-}
-
 static int s21_uint_to_base(unsigned long long value, int base, bool upper,
                             int precision, char *out, s21_size out_size) {
   if (out == S21_NULL || out_size == 0 || base < 2 || base > 16) return -1;
@@ -59,7 +48,7 @@ static int s21_build_with_width(char *out_buf, s21_size out_size,
   }
 
   int sign_len = (sign_char != '\0') ? 1 : 0;
-  int prefix_len = (int)s21_local_strlen(prefix);
+  int prefix_len = (int)s21_strlen(prefix);
   int total_len = sign_len + prefix_len + content_len;
 
   int width = spec->has_width ? spec->width : total_len;
@@ -91,7 +80,7 @@ static int s21_build_with_width(char *out_buf, s21_size out_size,
   return pos;
 }
 
-static char s21_sign_for_value(long double value, const s21_specifier *spec) {
+static char s21_sign_for_value(const long double value, const s21_specifier *spec) {
   if (signbit(value)) return '-';
   if (spec->flags.show_sign) return '+';
   if (spec->flags.space_sign) return ' ';
@@ -206,7 +195,7 @@ int s21_format_char(char *out_buf, s21_size out_size, int ch,
 int s21_format_string(char *out_buf, s21_size out_size, const char *src,
                       const s21_specifier *spec) {
   if (src == S21_NULL) src = "(null)";
-  int len = (int)s21_local_strlen(src);
+  int len = (int)s21_strlen(src);
   if (spec->has_precision && spec->precision < len) len = spec->precision;
   return s21_build_with_width(out_buf, out_size, src, len, '\0', "", spec,
                               false);
@@ -290,7 +279,6 @@ int s21_format_pointer(char *out_buf, s21_size out_size,
                        const s21_specifier *spec, va_list *ap) {
   if (out_buf == S21_NULL || spec == S21_NULL || ap == S21_NULL) return -1;
 
-  (void)spec;
   void *ptr = va_arg(*ap, void *);
   uintptr_t value = (uintptr_t)ptr;
 
@@ -299,7 +287,7 @@ int s21_format_pointer(char *out_buf, s21_size out_size,
     s21_specifier local = *spec;
     local.flags.zero_pad = false;
     return s21_build_with_width(out_buf, out_size, nil_value,
-                                (int)s21_local_strlen(nil_value), '\0', "",
+                                (int)s21_strlen(nil_value), '\0', "",
                                 &local, false);
   }
 
@@ -356,7 +344,7 @@ int s21_format_float_fixed(char *out_buf, s21_size out_size,
 
   char content[S21_FLOAT_BUF] = {0};
   int pos = 0;
-  s21_local_memcpy(content + pos, int_digits, (s21_size)int_len);
+  s21_memcpy(content + pos, int_digits, (s21_size)int_len);
   pos += int_len;
 
   if (precision > 0 || spec->flags.alt_form) {
@@ -364,7 +352,7 @@ int s21_format_float_fixed(char *out_buf, s21_size out_size,
   }
 
   if (precision > 0) {
-    s21_local_memcpy(content + pos, frac_digits, (s21_size)precision);
+    s21_memcpy(content + pos, frac_digits, (s21_size)precision);
     pos += precision;
   }
   content[pos] = '\0';
