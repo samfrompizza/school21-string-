@@ -323,7 +323,6 @@ int s21_format_float_fixed(char *out_buf, s21_size out_size,
 
   int precision = spec->has_precision ? spec->precision : 6;
   if (precision < 0) precision = 0;
-  if (precision > 18) precision = 18;
 
   unsigned long long int_part = 0;
   unsigned long long frac_part = 0;

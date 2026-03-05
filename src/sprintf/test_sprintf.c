@@ -23,6 +23,7 @@ static void assert_short(const char *fmt, short value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_long(const char *fmt, long value) {
@@ -30,6 +31,7 @@ static void assert_long(const char *fmt, long value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_ll(const char *fmt, long long value) {
@@ -37,6 +39,7 @@ static void assert_ll(const char *fmt, long long value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_uint(const char *fmt, unsigned int value) {
@@ -44,6 +47,7 @@ static void assert_uint(const char *fmt, unsigned int value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_ushort(const char *fmt, unsigned short value) {
@@ -51,6 +55,7 @@ static void assert_ushort(const char *fmt, unsigned short value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_ulong(const char *fmt, unsigned long value) {
@@ -58,6 +63,7 @@ static void assert_ulong(const char *fmt, unsigned long value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_ull(const char *fmt, unsigned long long value) {
@@ -65,6 +71,7 @@ static void assert_ull(const char *fmt, unsigned long long value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_double(const char *fmt, double value) {
@@ -72,6 +79,7 @@ static void assert_double(const char *fmt, double value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_long_double(const char *fmt, long double value) {
@@ -79,6 +87,7 @@ static void assert_long_double(const char *fmt, long double value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_wildcard_width_long_double(const char *fmt, int width,
@@ -87,6 +96,7 @@ static void assert_wildcard_width_long_double(const char *fmt, int width,
   int got_n = s21_sprintf(got, fmt, width, value);
   int exp_n = sprintf(exp, fmt, width, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_char(const char *fmt, char value) {
@@ -94,6 +104,7 @@ static void assert_char(const char *fmt, char value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_str(const char *fmt, const char *value) {
@@ -101,6 +112,7 @@ static void assert_str(const char *fmt, const char *value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_ptr(const char *fmt, void *value) {
@@ -108,6 +120,7 @@ static void assert_ptr(const char *fmt, void *value) {
   int got_n = s21_sprintf(got, fmt, value);
   int exp_n = sprintf(exp, fmt, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_wildcard_int(const char *fmt, int width, int value) {
@@ -115,6 +128,7 @@ static void assert_wildcard_int(const char *fmt, int width, int value) {
   int got_n = s21_sprintf(got, fmt, width, value);
   int exp_n = sprintf(exp, fmt, width, value);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_wildcard_precision_str(const char *fmt, int prec, const char *s) {
@@ -122,6 +136,7 @@ static void assert_wildcard_precision_str(const char *fmt, int prec, const char 
   int got_n = s21_sprintf(got, fmt, prec, s);
   int exp_n = sprintf(exp, fmt, prec, s);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 static void assert_wildcard_width_ptr(const char *fmt, int width, void *p) {
@@ -129,6 +144,7 @@ static void assert_wildcard_width_ptr(const char *fmt, int width, void *p) {
   int got_n = s21_sprintf(got, fmt, width, p);
   int exp_n = sprintf(exp, fmt, width, p);
   ck_assert_int_eq(got_n, exp_n);
+  ck_assert_str_eq(got, exp);
 }
 
 START_TEST(test_char_string_percent) {
@@ -138,12 +154,6 @@ START_TEST(test_char_string_percent) {
   assert_str("[%-8.3s]", "school");
   assert_str("[%.0s]", "abc");
   assert_str("[%10s]", "");
-  /* %% с width 
-  char g[BUF_SZ] = {0}, e[BUF_SZ] = {0};
-  int gn = s21_sprintf(g, "[%5%][%-5%]");
-  int en = sprintf(e, "[%5%][%-5%]");
-  ck_assert_int_eq(gn, en);
-  ck_assert_str_eq(g, e);*/
 }
 END_TEST
 
@@ -216,6 +226,7 @@ START_TEST(test_float_fixed_and_lengths) {
 
   assert_long_double("%Lf", 1.234567890123456789L);
   assert_long_double("%20.10Lf", 1.234567890123456789L);
+  assert_long_double("%.19Lf", 1.2345678901234567890123L);    // Problem: if .* (precision) > 19 test fails
   assert_wildcard_width_long_double("%+0*.2Lf", 8, 8.0L);
 }
 END_TEST
