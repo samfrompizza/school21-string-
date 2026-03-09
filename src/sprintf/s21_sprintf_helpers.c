@@ -80,7 +80,9 @@ static int s21_build_with_width(char *out_buf, s21_size out_size,
   return pos;
 }
 
-static char s21_sign_for_value(const long double value, const s21_specifier *spec) {
+static char s21_sign_for_value(const long double value,
+                               const s21_specifier *spec) {
+  if (isnan(value)) return '\0';
   if (signbit(value)) return '-';
   if (spec->flags.show_sign) return '+';
   if (spec->flags.space_sign) return ' ';
