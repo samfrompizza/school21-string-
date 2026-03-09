@@ -1,10 +1,10 @@
 #include "s21_parse_helpers.h"
 
-int s21_isdigit(int ch) {
+inline int s21_isdigit(int ch) {
   return ch >= '0' && ch <= '9';
 }
 
-int s21_isspace(int ch) {
+inline int s21_isspace(int ch) {
   return ch == ' '  ||
          ch == '\f' ||
          ch == '\n' ||
@@ -13,15 +13,15 @@ int s21_isspace(int ch) {
          ch == '\v';
 }
 
-int s21_isoctal(int ch) {
+inline int s21_isoctal(int ch) {
   return ch >= '0' && ch <= '7';
 }
 
-int s21_isxdigit_parse(int ch) {
+inline int s21_isxdigit_parse(int ch) {
   return s21_isdigit(ch) || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
 }
 
-int s21_xdigit_value(int ch) {
+inline int s21_xdigit_value(int ch) {
   if (ch >= '0' && ch <= '9') {
     return ch - '0';
   }
@@ -34,7 +34,7 @@ int s21_xdigit_value(int ch) {
   return -1;
 }
 
-void s21_skip_whitespace(const char** p) {
+inline void s21_skip_whitespace(const char** p) {
   while (**p && s21_isspace((unsigned char)**p)) {
     (*p)++;
   }
