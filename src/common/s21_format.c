@@ -1,17 +1,19 @@
 #include "s21_format.h"
+#include <ctype.h>
+
 #include "../string/s21_string.h"
 #include <ctype.h>
 #include <stddef.h>
 
 // Helper static functions declaration
-static const char *parse_flags(const char *format, s21_specifier *spec);
-static const char *parse_width(const char *format, s21_specifier *spec);
-static const char *parse_precision(const char *format, s21_specifier *spec);
-static const char *parse_length(const char *format, s21_specifier *spec);
-static const char *parse_spec_letter(const char *format, s21_specifier *spec);
+static const char* parse_flags(const char* format, s21_specifier* spec);
+static const char* parse_width(const char* format, s21_specifier* spec);
+static const char* parse_precision(const char* format, s21_specifier* spec);
+static const char* parse_length(const char* format, s21_specifier* spec);
+static const char* parse_spec_letter(const char* format, s21_specifier* spec);
 
 // Helper static functions implementation
-static const char *parse_flags(const char *format, s21_specifier *spec) {
+static const char* parse_flags(const char* format, s21_specifier* spec) {
   while (true) {
     switch (*format) {
       case '-':
@@ -36,7 +38,7 @@ static const char *parse_flags(const char *format, s21_specifier *spec) {
   }
 }
 
-static const char *parse_width(const char *format, s21_specifier *spec) {
+static const char* parse_width(const char* format, s21_specifier* spec) {
   if (*format == '*') {
     spec->width_from_arg = true;
     spec->has_width = true;
@@ -53,7 +55,7 @@ static const char *parse_width(const char *format, s21_specifier *spec) {
   return format;
 }
 
-static const char *parse_precision(const char *format, s21_specifier *spec) {
+static const char* parse_precision(const char* format, s21_specifier* spec) {
   if (*format == '.') {
     spec->has_precision = true;
     format++;
@@ -77,7 +79,7 @@ static const char *parse_precision(const char *format, s21_specifier *spec) {
   return format;
 }
 
-static const char *parse_length(const char *format, s21_specifier *spec) {
+static const char* parse_length(const char* format, s21_specifier* spec) {
   if (*format == 'h') {
     spec->len = LEN_SHORT;
     format++;
@@ -101,31 +103,36 @@ static const char *parse_spec_letter(const char *format, s21_specifier *spec) {
   spec->valid = true;
   spec->val = *format;
 
-  if (*format == 'c')
+  if (*format == 'c') {
     spec->var = VAR_CHAR;
-  else if (s21_strchr("diouxX", *format))
+  } else if (s21_strchr("diouxX", *format)) {
     spec->var = VAR_DECIMAL;
-  else if (s21_strchr("eEfgG", *format))
+  } else if (s21_strchr("eEfgG", *format)) {
     spec->var = VAR_FLOAT;
-  else if (*format == 's')
+  } else if (*format == 's') {
     spec->var = VAR_STRING;
-  else if (*format == 'p')
+  } else if (*format == 'p') {
     spec->var = VAR_POINTER;
-  else if (*format == 'n')
+  } else if (*format == 'n') {
     spec->var = VAR_NREAD;
-  else if (*format == '%')
+  } else if (*format == '%') {
     spec->var = VAR_SYMBOL;
-  else
+  } else {
     spec->valid = false;
+  }
 
-  if (spec->valid) format++;
+  if (spec->valid) {
+    format++;
+  }
 
   return format;
 }
 
 // Public API
-const char *s21_parse_spec(const char *format, s21_specifier *spec) {
-  if (!format) return S21_NULL;
+const char* s21_parse_spec(const char* format, s21_specifier* spec) {
+  if (!format) {
+    return S21_NULL;
+  }
 
   format = parse_flags(format, spec);
   format = parse_width(format, spec);
@@ -136,8 +143,10 @@ const char *s21_parse_spec(const char *format, s21_specifier *spec) {
   return format;
 }
 
-void s21_validate_spec(s21_specifier *spec) {
-  if (!spec->valid) return;
+void s21_validate_spec(s21_specifier* spec) {
+  if (!spec->valid) {
+    return;
+  }
 
   // '-' declines '0'
   if (spec->flags.left_align) {
