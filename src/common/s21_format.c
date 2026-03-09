@@ -1,8 +1,9 @@
 #include "s21_format.h"
-
 #include <ctype.h>
 
 #include "../string/s21_string.h"
+#include <ctype.h>
+#include <stddef.h>
 
 // Helper static functions declaration
 static const char* parse_flags(const char* format, s21_specifier* spec);
@@ -42,10 +43,10 @@ static const char* parse_width(const char* format, s21_specifier* spec) {
     spec->width_from_arg = true;
     spec->has_width = true;
     format++;
-  } else if (isdigit(*format)) {
+  } else if (isdigit((unsigned char)*format)) {
     spec->has_width = true;
     spec->width = 0;
-    while (isdigit(*format)) {
+    while (isdigit((unsigned char)*format)) {
       spec->width = spec->width * 10 + (*format - '0');
       format++;
     }
@@ -64,9 +65,9 @@ static const char* parse_precision(const char* format, s21_specifier* spec) {
     if (*format == '*') {
       spec->precision_from_arg = true;
       format++;
-    } else if (isdigit(*format)) {
+    } else if (isdigit((unsigned char)*format)) {
       spec->precision = 0;
-      while (isdigit(*format)) {
+      while (isdigit((unsigned char)*format)) {
         spec->precision = spec->precision * 10 + (*format - '0');
         format++;
       }
@@ -98,8 +99,8 @@ static const char* parse_length(const char* format, s21_specifier* spec) {
   return format;
 }
 
-static const char* parse_spec_letter(const char* format, s21_specifier* spec) {
-  spec->valid = true;  // Single responsibility??
+static const char *parse_spec_letter(const char *format, s21_specifier *spec) {
+  spec->valid = true;
   spec->val = *format;
 
   if (*format == 'c') {
