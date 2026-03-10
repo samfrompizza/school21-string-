@@ -4,6 +4,7 @@
 
 void run_testcase(Suite* testcase) {
   SRunner* sr = srunner_create(testcase);
+  // srunner_set_fork_status(sr, CK_NOFORK);
   srunner_run_all(sr, CK_NORMAL);
   int failed = srunner_ntests_failed(sr);
   srunner_free(sr);
