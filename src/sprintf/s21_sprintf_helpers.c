@@ -53,10 +53,11 @@ static int s21_uint_to_base(unsigned long long value, int base, bool upper,
   return len;
 }
 
-static int
-s21_build_with_width(char* out_buf, s21_size out_size, const char* content,
-                     int content_len, char sign_char, const char* prefix,
-                     const s21_specifier* spec, bool zero_pad_allowed) {
+static int s21_build_with_width(char* out_buf, s21_size out_size,
+                                const char* content, int content_len,
+                                char sign_char, const char* prefix,
+                                const s21_specifier* spec,
+                                bool zero_pad_allowed) {
   if (out_buf == S21_NULL || content == S21_NULL || prefix == S21_NULL ||
       spec == S21_NULL || out_size == 0 || content_len < 0) {
     return -1;
@@ -114,8 +115,8 @@ s21_build_with_width(char* out_buf, s21_size out_size, const char* content,
 
 static int s21_locale_wide_once;
 
-static char
-s21_sign_for_value(const long double value, const s21_specifier* spec) {
+static char s21_sign_for_value(const long double value,
+                               const s21_specifier* spec) {
   if (isnan(value)) {
     return '\0';
   }
@@ -228,8 +229,8 @@ long long s21_get_signed_arg(va_list* ap, const s21_specifier* spec) {
   }
 }
 
-unsigned long long
-s21_get_unsigned_arg(va_list* ap, const s21_specifier* spec) {
+unsigned long long s21_get_unsigned_arg(va_list* ap,
+                                        const s21_specifier* spec) {
   if (ap == S21_NULL || spec == S21_NULL) {
     return 0;
   }

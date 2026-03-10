@@ -1,3 +1,6 @@
+#include <math.h>
+#include <wchar.h>
+
 #include "../../tests_includes/s21_tests.h"
 
 START_TEST(simple_int) {
@@ -713,6 +716,154 @@ START_TEST(null_ptr) {
   char* ptr = NULL;
   ck_assert_int_eq(s21_sprintf(str1, format, ptr), sprintf(str2, format, ptr));
 
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(invalid_format_specifier) {
+  char str1[BUFF_SIZE];
+  char* format = "%q";
+  int ret = s21_sprintf(str1, format, 42);
+  ck_assert_int_eq(ret, -1);
+}
+END_TEST
+
+START_TEST(lld_format) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%lld";
+  long long val = 9223372036854775807LL;
+  ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(llu_format) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%llu";
+  unsigned long long val = 18446744073709551615ULL;
+  ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(null_string) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-overflow"
+#pragma GCC diagnostic ignored "-Wformat"
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%s";
+  char* ptr = NULL;
+  ck_assert_int_eq(s21_sprintf(str1, format, ptr), sprintf(str2, format, ptr));
+  ck_assert_str_eq(str1, str2);
+#pragma GCC diagnostic pop
+}
+END_TEST
+
+START_TEST(negative_width) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%*d";
+  ck_assert_int_eq(s21_sprintf(str1, format, -10, 42),
+                   sprintf(str2, format, -10, 42));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(negative_precision) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%.*s";
+  char* s = "hello";
+  ck_assert_int_eq(s21_sprintf(str1, format, -1, s),
+                   sprintf(str2, format, -1, s));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(nan_float) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%f";
+  double val = (double)NAN;
+  ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(inf_float) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%f";
+  double val = (double)INFINITY;
+  ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(wide_string_null) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-overflow"
+#pragma GCC diagnostic ignored "-Wformat"
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%ls";
+  wchar_t* ws = NULL;
+  ck_assert_int_eq(s21_sprintf(str1, format, ws), sprintf(str2, format, ws));
+  ck_assert_str_eq(str1, str2);
+#pragma GCC diagnostic pop
+}
+END_TEST
+
+START_TEST(octal_alt_form_zero_precision) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%#.0o";
+  unsigned val = 0;
+  ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(wide_string_zero_pad) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  wchar_t ws[] = L"ab";
+  char* format = "%06ls";
+  ck_assert_int_eq(s21_sprintf(str1, format, ws), sprintf(str2, format, ws));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(e_format_left_align) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%-15e";
+  double val = 1.5e10;
+  ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(e_format_show_sign) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%+15e";
+  double val = 1.5e10;
+  ck_assert_int_eq(s21_sprintf(str1, format, val), sprintf(str2, format, val));
+  ck_assert_str_eq(str1, str2);
+}
+END_TEST
+
+START_TEST(g_format_flags) {
+  char str1[BUFF_SIZE];
+  char str2[BUFF_SIZE];
+  char* format = "%-10g %010g %+g % g";
+  double a = 123.456, b = 0.001, c = 42.0, d = 7.0;
+  ck_assert_int_eq(s21_sprintf(str1, format, a, b, c, d),
+                   sprintf(str2, format, a, b, c, d));
   ck_assert_str_eq(str1, str2);
 }
 END_TEST
@@ -2261,6 +2412,20 @@ Suite* suite_sprintf(void) {
   tcase_add_test(tc, ptr_width);
   tcase_add_test(tc, ptr_precision);
   tcase_add_test(tc, null_ptr);
+  tcase_add_test(tc, invalid_format_specifier);
+  tcase_add_test(tc, lld_format);
+  tcase_add_test(tc, llu_format);
+  tcase_add_test(tc, null_string);
+  tcase_add_test(tc, negative_width);
+  tcase_add_test(tc, negative_precision);
+  tcase_add_test(tc, nan_float);
+  tcase_add_test(tc, inf_float);
+  tcase_add_test(tc, wide_string_null);
+  tcase_add_test(tc, octal_alt_form_zero_precision);
+  tcase_add_test(tc, wide_string_zero_pad);
+  tcase_add_test(tc, e_format_left_align);
+  tcase_add_test(tc, e_format_show_sign);
+  tcase_add_test(tc, g_format_flags);
   tcase_add_test(tc, n_specifier);
   tcase_add_test(tc, string_width_huge);
   tcase_add_test(tc, float_precision);

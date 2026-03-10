@@ -1,17 +1,13 @@
 #include "s21_parse_helpers.h"
 
-inline int s21_isdigit(int ch) {
-  return ch >= '0' && ch <= '9';
-}
+inline int s21_isdigit(int ch) { return ch >= '0' && ch <= '9'; }
 
 inline int s21_isspace(int ch) {
   return ch == ' ' || ch == '\f' || ch == '\n' || ch == '\r' || ch == '\t' ||
          ch == '\v';
 }
 
-inline int s21_isoctal(int ch) {
-  return ch >= '0' && ch <= '7';
-}
+inline int s21_isoctal(int ch) { return ch >= '0' && ch <= '7'; }
 
 inline int s21_isxdigit_parse(int ch) {
   return s21_isdigit(ch) || (ch >= 'a' && ch <= 'f') ||

@@ -969,6 +969,39 @@ START_TEST(n4) {
 }
 END_TEST
 
+START_TEST(n_hn) {
+  short n1 = 0, n2 = 0;
+  const char str[] = "abc";
+  const char fstr[] = "a%hn";
+  int res1 = s21_sscanf(str, fstr, &n1);
+  int res2 = sscanf(str, fstr, &n2);
+  ck_assert_int_eq(res1, res2);
+  ck_assert_int_eq(n1, n2);
+}
+END_TEST
+
+START_TEST(n_ln) {
+  long n1 = 0, n2 = 0;
+  const char str[] = "abc";
+  const char fstr[] = "ab%ln";
+  int res1 = s21_sscanf(str, fstr, &n1);
+  int res2 = sscanf(str, fstr, &n2);
+  ck_assert_int_eq(res1, res2);
+  ck_assert_int_eq(n1, n2);
+}
+END_TEST
+
+START_TEST(n_lln) {
+  long long n1 = 0, n2 = 0;
+  const char str[] = "xyz";
+  const char fstr[] = "xyz%lln";
+  int res1 = s21_sscanf(str, fstr, &n1);
+  int res2 = sscanf(str, fstr, &n2);
+  ck_assert_int_eq(res1, res2);
+  ck_assert_int_eq(n1, n2);
+}
+END_TEST
+
 START_TEST(n5) {
   long long a1 = 0, a2 = 0, b1 = 0, b2 = 0, c1 = 0, c2 = 0, d1 = 0, d2 = 0;
   int n1 = 0, n2 = 5;
@@ -2319,6 +2352,9 @@ Suite* suite_sscanf(void) {
   tcase_add_test(tc, n3);
   tcase_add_test(tc, n4);
   tcase_add_test(tc, n5);
+  tcase_add_test(tc, n_hn);
+  tcase_add_test(tc, n_ln);
+  tcase_add_test(tc, n_lln);
 
   tcase_add_test(tc, upeer_hex_base_version);
   tcase_add_test(tc, upeer_hex_overflow);

@@ -48,6 +48,14 @@ START_TEST(empty_src) {
 }
 END_TEST
 
+START_TEST(find_nul_byte) {
+  char src[] = "hello";
+  char find = '\0';
+
+  ck_assert_pstr_eq(s21_strchr(src, find), strchr(src, find));
+}
+END_TEST
+
 Suite* suite_strchr(void) {
   Suite* s = suite_create("suite_strchr");
   TCase* tc = tcase_create("strchr_tc");
@@ -58,6 +66,7 @@ Suite* suite_strchr(void) {
   tcase_add_test(tc, abobasnutAsa_find_Z);
   tcase_add_test(tc, abobasnutAsa_find_3);
   tcase_add_test(tc, empty_src);
+  tcase_add_test(tc, find_nul_byte);
 
   suite_add_tcase(s, tc);
   return s;

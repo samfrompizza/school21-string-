@@ -9,14 +9,14 @@
 
 #define DUMMY_SIZE 64
 
-static inline void
-sscanf_skip_whitespace(const char** format_p, const char** str_p) {
+static inline void sscanf_skip_whitespace(const char** format_p,
+                                          const char** str_p) {
   s21_skip_whitespace(format_p);
   s21_skip_whitespace(str_p);
 }
 
-static inline int
-sscanf_match_literal(const char** format_p, const char** str_p) {
+static inline int sscanf_match_literal(const char** format_p,
+                                       const char** str_p) {
   if (**str_p != **format_p) {
     return 0;
   }

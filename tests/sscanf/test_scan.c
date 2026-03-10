@@ -44,8 +44,8 @@ static void build_format(char* out, size_t cap, int width,
   }
 }
 
-static void
-spec_init(s21_specifier* spec, int width, s21_format_length len, char val) {
+static void spec_init(s21_specifier* spec, int width, s21_format_length len,
+                      char val) {
   memset(spec, 0, sizeof(*spec));
   spec->valid = 1;
   spec->val = val;

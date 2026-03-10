@@ -20,6 +20,7 @@ endif
 SRC_DIR = src
 TEST_DIR = tests
 BUILD_DIR = build
+STRING_LIB = s21_string.a
 
 # -----------------------------------------------------------------------------
 # Variables: Source Files (mirrors src/ hierarchy)
@@ -40,11 +41,6 @@ SPRINTF_OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SPRINTF_SRCS))
 EXTRA_OBJS   := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(EXTRA_SRCS))
 COMMON_OBJS  := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(COMMON_SRCS))
 OBJS         := $(COMMON_OBJS) $(STRING_OBJS) $(SSCANF_OBJS) $(SPRINTF_OBJS) $(EXTRA_OBJS)
-
-# -----------------------------------------------------------------------------
-# Variables: Library
-# -----------------------------------------------------------------------------
-STRING_LIB = s21_string.a
 
 # -----------------------------------------------------------------------------
 # Variables: Local Project Tests (mirrors src/ under tests/)
@@ -93,9 +89,9 @@ endif
 # =============================================================================
 
 .PHONY: all
-all: $(STRING_LIB)
+all: s21_string.a
 
-$(STRING_LIB): $(OBJS)
+s21_string.a: $(OBJS)
 	ar rcs $@ $^
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
@@ -164,9 +160,9 @@ leak_check_github: test_github
 rebuild: clean all
 
 clean:
-	rm -rf $(BUILD_DIR) $(STRING_LIB)
-	rm -f test_scan test_sprintf test_github test_string test_sscanf test_extra test_common
-	rm -f *.gc* report gcov_report.info
+	rm -rf $(BUILD_DIR) $(STRING_LIB) report
+	rm -f test_scan test_sprintf test_github test_gcov test_string test_sscanf test_extra test_common
+	rm -f *.gc* gcov_report.info
 
 # =============================================================================
 # TOOLS (style, format, gcov_report)
@@ -181,11 +177,9 @@ format:
 
 gcov_report:
 	$(MAKE) clean
-	$(CC) $(CFLAGS) $(GCOV_FLAGS) $(SRCS) $(TEST_STRING_SRCS) $(TEST_SSCANF_SRCS) \
-	      $(TEST_SPRINTF_SRCS) $(TEST_EXTRA_SRCS) $(TEST_COMMON_SRCS) \
-	      -o test_all $(TEST_LIBS)
-	./test_all
-	lcov -t "gcov_report" -o gcov_report.info -c -d .
-	genhtml -o report gcov_report.info
-	open report/index.html
-	$(MAKE) clean
+	$(CC) $(CFLAGS) -Wno-unused-variable -Wno-stringop-truncation $(GCOV_FLAGS) $(SRCS) $(TEST_GITHUB_SRCS) -o test_gcov $(TEST_LIBS)
+	./test_gcov
+	lcov -t "gcov_report" -o gcov_report.info -c -d . --ignore-errors inconsistent
+	genhtml -o report gcov_report.info --ignore-errors inconsistent
+	@if [ "$(UNAME)" = "Linux" ]; then xdg-open report/index.html 2>/dev/null || true; else open report/index.html; fi
+	@echo "Coverage report: report/index.html"

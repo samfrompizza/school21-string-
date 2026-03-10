@@ -131,8 +131,8 @@ static void assert_wildcard_int(const char* fmt, int width, int value) {
   ck_assert_str_eq(got, exp);
 }
 
-static void
-assert_wildcard_precision_str(const char* fmt, int prec, const char* s) {
+static void assert_wildcard_precision_str(const char* fmt, int prec,
+                                          const char* s) {
   char got[BUF_SZ] = {0}, exp[BUF_SZ] = {0};
   int got_n = s21_sprintf(got, fmt, prec, s);
   int exp_n = sprintf(exp, fmt, prec, s);

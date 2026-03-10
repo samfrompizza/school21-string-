@@ -34,8 +34,8 @@ void scan_decimal_parse_prefix(const char** p_out, int* width_left,
   *p_out = p;
 }
 
-unsigned long long
-scan_decimal_parse_digits(const char** p_out, int* width_left, int base) {
+unsigned long long scan_decimal_parse_digits(const char** p_out,
+                                             int* width_left, int base) {
   const char* p = *p_out;
   unsigned long long value = 0;
 
