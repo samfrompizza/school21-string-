@@ -8,7 +8,7 @@
 int scan_get_width(const s21_specifier* spec);
 
 void scan_decimal_parse_prefix(const char** p_out, int* width_left,
-                               char spec_val, int* base, int* allow_sign);
+                               char spec_val, int* base);
 
 unsigned long long
 scan_decimal_parse_digits(const char** p_out, int* width_left, int base);

@@ -5,11 +5,7 @@ inline int s21_isdigit(int ch) {
 }
 
 inline int s21_isspace(int ch) {
-  return ch == ' '  ||
-         ch == '\f' ||
-         ch == '\n' ||
-         ch == '\r' ||
-         ch == '\t' ||
+  return ch == ' ' || ch == '\f' || ch == '\n' || ch == '\r' || ch == '\t' ||
          ch == '\v';
 }
 
@@ -18,7 +14,8 @@ inline int s21_isoctal(int ch) {
 }
 
 inline int s21_isxdigit_parse(int ch) {
-  return s21_isdigit(ch) || (ch >= 'a' && ch <= 'f') || (ch >= 'A' && ch <= 'F');
+  return s21_isdigit(ch) || (ch >= 'a' && ch <= 'f') ||
+         (ch >= 'A' && ch <= 'F');
 }
 
 inline int s21_xdigit_value(int ch) {

@@ -3,9 +3,9 @@
 #include <stdbool.h>
 
 #include "../common/s21_format.h"
+#include "../common/s21_parse_helpers.h"
 #include "../string/s21_string.h"
 #include "scan.h"
-#include "../common/s21_parse_helpers.h"
 
 #define DUMMY_SIZE 64
 
@@ -71,7 +71,7 @@ static int sscanf_process_spec(const char** format_p, const char** str_p,
 
   *format_p = format;
   *str_p = next;
-  if (!suppress) {
+  if (!suppress && spec.var != VAR_NREAD) {
     (*assigned)++;
   }
   return 0;
@@ -101,5 +101,12 @@ int s21_sscanf(const char* str, const char* format, ...) {
   }
 
   va_end(args);
+  if (assigned == 0) {
+    const char* q = str;
+    s21_skip_whitespace((const char**)&q);
+    if (!*q) {
+      return -1;
+    }
+  }
   return assigned;
 }

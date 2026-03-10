@@ -3,7 +3,7 @@
 #include "../common/s21_format.h"
 #include "s21_sprintf_helpers.h"
 
-static int s21_append_fragment(char **dst, const char *src, int src_len) {
+static int s21_append_fragment(char** dst, const char* src, int src_len) {
   if (dst == S21_NULL || *dst == S21_NULL || src == S21_NULL || src_len < 0) {
     return -1;
   }
@@ -13,20 +13,30 @@ static int s21_append_fragment(char **dst, const char *src, int src_len) {
     (*dst)++;
   }
 
-    return 0;
+  return 0;
 }
 
-static int s21_handle_specifier(char *fragment, s21_size fragment_size,
-                                s21_specifier *spec, va_list *ap) {
+static int s21_handle_specifier(char* fragment, s21_size fragment_size,
+                                s21_specifier* spec, va_list* ap) {
   int len = -1;
 
   switch (spec->var) {
     case VAR_CHAR:
-      len = s21_format_char(fragment, fragment_size, va_arg(*ap, int), spec);
+      if (spec->len == LEN_LONG) {
+        len = s21_format_wide_char(fragment, fragment_size,
+                                   va_arg(*ap, wchar_t), spec);
+      } else {
+        len = s21_format_char(fragment, fragment_size, va_arg(*ap, int), spec);
+      }
       break;
     case VAR_STRING:
-      len = s21_format_string(fragment, fragment_size, va_arg(*ap, const char *),
-                              spec);
+      if (spec->len == LEN_LONG) {
+        len = s21_format_wide_string(fragment, fragment_size,
+                                     va_arg(*ap, const wchar_t*), spec);
+      } else {
+        len = s21_format_string(fragment, fragment_size,
+                                va_arg(*ap, const char*), spec);
+      }
       break;
     case VAR_DECIMAL:
       if (spec->val == 'd' || spec->val == 'i') {
@@ -39,6 +49,10 @@ static int s21_handle_specifier(char *fragment, s21_size fragment_size,
     case VAR_FLOAT:
       if (spec->val == 'f') {
         len = s21_format_float_fixed(fragment, fragment_size, spec, ap);
+      } else if (spec->val == 'e' || spec->val == 'E') {
+        len = s21_format_float_exp(fragment, fragment_size, spec, ap);
+      } else if (spec->val == 'g' || spec->val == 'G') {
+        len = s21_format_float_g(fragment, fragment_size, spec, ap);
       }
       break;
     case VAR_POINTER:
@@ -54,15 +68,17 @@ static int s21_handle_specifier(char *fragment, s21_size fragment_size,
   return len;
 }
 
-int s21_sprintf(char *str, const char *format, ...) {
-  if (str == S21_NULL || format == S21_NULL) return -1;
+int s21_sprintf(char* str, const char* format, ...) {
+  if (str == S21_NULL || format == S21_NULL) {
+    return -1;
+  }
 
   va_list ap;
   va_start(ap, format);
 
-  const char *fmt = format;
-  char *out = str;
-  char *start = str;
+  const char* fmt = format;
+  char* out = str;
+  char* start = str;
 
   while (*fmt != '\0') {
     if (*fmt != '%') {
@@ -84,9 +100,19 @@ int s21_sprintf(char *str, const char *format, ...) {
 
     s21_read_width_precision_from_args(&spec, &ap);
 
+    if (spec.var == VAR_NREAD) {
+      int* n_ptr = va_arg(ap, int*);
+      if (n_ptr != S21_NULL) {
+        *n_ptr = (int)(out - start);
+      }
+      continue;
+    }
+
     char fragment[S21_FLOAT_BUF] = {0};
-    int fragment_len = s21_handle_specifier(fragment, sizeof(fragment), &spec, &ap);
-    if (fragment_len < 0 || s21_append_fragment(&out, fragment, fragment_len) < 0) {
+    int fragment_len =
+        s21_handle_specifier(fragment, sizeof(fragment), &spec, &ap);
+    if (fragment_len < 0 ||
+        s21_append_fragment(&out, fragment, fragment_len) < 0) {
       va_end(ap);
       return -1;
     }

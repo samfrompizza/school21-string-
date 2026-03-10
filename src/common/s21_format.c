@@ -1,9 +1,9 @@
 #include "s21_format.h"
-#include <ctype.h>
 
-#include "../string/s21_string.h"
 #include <ctype.h>
 #include <stddef.h>
+
+#include "../string/s21_string.h"
 
 // Helper static functions declaration
 static const char* parse_flags(const char* format, s21_specifier* spec);
@@ -99,7 +99,7 @@ static const char* parse_length(const char* format, s21_specifier* spec) {
   return format;
 }
 
-static const char *parse_spec_letter(const char *format, s21_specifier *spec) {
+static const char* parse_spec_letter(const char* format, s21_specifier* spec) {
   spec->valid = true;
   spec->val = *format;
 

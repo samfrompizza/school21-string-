@@ -10,7 +10,7 @@ int scan_get_width(const s21_specifier* spec) {
 }
 
 void scan_decimal_parse_prefix(const char** p_out, int* width_left,
-                               char spec_val, int* base, int* allow_sign) {
+                               char spec_val, int* base) {
   const char* p = *p_out;
 
   if (spec_val == 'i') {
@@ -18,21 +18,17 @@ void scan_decimal_parse_prefix(const char** p_out, int* width_left,
       *base = 16;
       p += 2;
       *width_left -= 2;
-      *allow_sign = 0;
     } else if (*width_left >= 1 && p[0] == '0') {
       *base = 8;
-      *allow_sign = 0;
     }
   } else if (spec_val == 'o') {
     *base = 8;
-    *allow_sign = 0;
   } else if (spec_val == 'x' || spec_val == 'X') {
     if (*width_left >= 2 && p[0] == '0' && (p[1] == 'x' || p[1] == 'X')) {
       p += 2;
       *width_left -= 2;
     }
     *base = 16;
-    *allow_sign = 0;
   }
 
   *p_out = p;

@@ -60,7 +60,8 @@ static const char* scan_char(ScanState* state) {
 }
 
 static const char* scan_decimal(ScanState* state) {
-  const char* p = state->str;
+  const char* original = state->str;
+  const char* p = original;
   s21_skip_whitespace(&p);
 
   int width_left =
@@ -71,34 +72,29 @@ static const char* scan_decimal(ScanState* state) {
 
   int sign = 1;
   int base = 10;
-  int allow_sign = 1;
-
-  scan_decimal_parse_prefix(&p, &width_left, state->spec->val, &base,
-                            &allow_sign);
-
-  if (allow_sign && width_left > 0 && (*p == '+' || *p == '-')) {
+  if (width_left > 0 && (*p == '+' || *p == '-')) {
     sign = (*p == '-') ? -1 : 1;
     p++;
     width_left--;
   }
+
+  scan_decimal_parse_prefix(&p, &width_left, state->spec->val, &base);
 
   const char* start = p;
   unsigned long long value = scan_decimal_parse_digits(&p, &width_left, base);
   int parsed = (p != start);
 
   if (!parsed) {
-    if (p != state->str) {
-      state->str = p;
-    }
-    return state->str;
+    return original;
   }
 
   state->str = p;
+  long long signed_value = sign * (long long)value;
   if (state->spec->val == 'u' || state->spec->val == 'o' ||
       state->spec->val == 'x' || state->spec->val == 'X') {
-    scan_assign_unsigned(state, value);
+    scan_assign_unsigned(state, (unsigned long long)signed_value);
   } else {
-    scan_assign_signed(state, sign * (long long)value);
+    scan_assign_signed(state, signed_value);
   }
   return state->str;
 }
@@ -135,20 +131,23 @@ static const char* scan_float(ScanState* state) {
 
   if (state->spec->len == LEN_LONG_DOUBLE) {
     *(long double*)(state->param) = (long double)d;
-  } else {
+  } else if (state->spec->len == LEN_LONG) {
     *(double*)(state->param) = d;
+  } else {
+    *(float*)(state->param) = (float)d;
   }
   state->str = state->str + consumed;
   return state->str;
 }
 
 static const char* scan_string(ScanState* state) {
-  const char* p = state->str;
+  const char* original = state->str;
   s21_skip_whitespace(&state->str);
+  const char* p = state->str;
 
   int width_left = scan_get_width(state->spec);
   if (width_left <= 0 || !*p) {
-    return state->str;
+    return original;
   }
 
   char* dest = (char*)state->param;
@@ -160,7 +159,7 @@ static const char* scan_string(ScanState* state) {
   }
   *dest = '\0';
   if (n == 0) {
-    return state->str;
+    return original;
   }
   state->str = p;
   return state->str;

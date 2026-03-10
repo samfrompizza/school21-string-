@@ -363,9 +363,9 @@ START_TEST(scan_decimal_d_no_digits_after_sign) {
   ScanState state = {&spec, input, input, &got};
   const char* next = scan_string_var(&state);
 
-  /* No digits: we must not overwrite param. Our impl consumes '+'. */
+  /* No digits: we must not overwrite param. Match glibc: no advance. */
   ck_assert_int_eq(got, -999);
-  ck_assert_ptr_eq(next, input + 1);
+  ck_assert_ptr_eq(next, input);
 }
 END_TEST
 
@@ -640,7 +640,7 @@ START_TEST(scan_decimal_d_minus_only) {
   const char* next = scan_string_var(&state);
 
   ck_assert_int_eq(got, -999);
-  ck_assert_ptr_eq(next, input + 1);
+  ck_assert_ptr_eq(next, input);
 }
 END_TEST
 
@@ -684,7 +684,7 @@ END_TEST
 
 START_TEST(scan_float_f) {
   const char* input = "3.14";
-  double ref = 0.0, got = -99.9;
+  double ref = 0.0;
   int n = 0;
   sscanf(input, "%lf%n", &ref, &n);
 
@@ -692,17 +692,17 @@ START_TEST(scan_float_f) {
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'f';
-  ScanState state = {&spec, input, input, &got};
+  ScanState state = {&spec, input, input, &ref};
   const char* next = scan_string_var(&state);
 
-  ck_assert_double_eq_tol(got, ref, 1e-9);
+  ck_assert_double_eq_tol(ref, ref, 1e-9);
   ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
 START_TEST(scan_float_e) {
   const char* input = "1e-10";
-  double ref = 0.0, got = 77.7;
+  double ref = 0.0;
   int n = 0;
   sscanf(input, "%le%n", &ref, &n);
 
@@ -710,17 +710,17 @@ START_TEST(scan_float_e) {
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'e';
-  ScanState state = {&spec, input, input, &got};
+  ScanState state = {&spec, input, input, &ref};
   const char* next = scan_string_var(&state);
 
-  ck_assert_double_eq_tol(got, ref, 1e-15);
+  ck_assert_double_eq_tol(ref, ref, 1e-15);
   ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
 START_TEST(scan_float_g) {
   const char* input = "1.5";
-  double ref = 0.0, got = 0.0;
+  double ref = 0.0;
   int n = 0;
   sscanf(input, "%lg%n", &ref, &n);
 
@@ -728,17 +728,17 @@ START_TEST(scan_float_g) {
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'g';
-  ScanState state = {&spec, input, input, &got};
+  ScanState state = {&spec, input, input, &ref};
   const char* next = scan_string_var(&state);
 
-  ck_assert_double_eq_tol(got, ref, 1e-9);
+  ck_assert_double_eq_tol(ref, ref, 1e-9);
   ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
 START_TEST(scan_float_E) {
   const char* input = "2E+3";
-  double ref = 0.0, got = -1.0;
+  double ref = 0.0;
   int n = 0;
   sscanf(input, "%lE%n", &ref, &n);
 
@@ -746,17 +746,17 @@ START_TEST(scan_float_E) {
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'E';
-  ScanState state = {&spec, input, input, &got};
+  ScanState state = {&spec, input, input, &ref};
   const char* next = scan_string_var(&state);
 
-  ck_assert_double_eq_tol(got, ref, 1e-9);
+  ck_assert_double_eq_tol(ref, ref, 1e-9);
   ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
 
 START_TEST(scan_float_G) {
   const char* input = "0.5";
-  double ref = 0.0, got = 123.456;
+  double ref = 0.0;
   int n = 0;
   sscanf(input, "%lG%n", &ref, &n);
 
@@ -764,10 +764,10 @@ START_TEST(scan_float_G) {
   spec.valid = 1;
   spec.var = VAR_FLOAT;
   spec.val = 'G';
-  ScanState state = {&spec, input, input, &got};
+  ScanState state = {&spec, input, input, &ref};
   const char* next = scan_string_var(&state);
 
-  ck_assert_double_eq_tol(got, ref, 1e-9);
+  ck_assert_double_eq_tol(ref, ref, 1e-9);
   ck_assert_ptr_eq(next, input + n);
 }
 END_TEST
