@@ -1879,9 +1879,9 @@ END_TEST
 START_TEST(test_sprintf26) {
   char str1[BUFF_SIZE];
   char str2[BUFF_SIZE];
-  char format[] = "%%";
+  // char format[] = "%%";
 
-  ck_assert_int_eq(s21_sprintf(str1, format), sprintf(str2, format));
+  ck_assert_int_eq(s21_sprintf(str1, "%%"), sprintf(str2, "%%"));
 
   ck_assert_str_eq(str1, str2);
 }
@@ -1890,9 +1890,9 @@ END_TEST
 START_TEST(test_sprintf27) {
   char str1[BUFF_SIZE];
   char str2[BUFF_SIZE];
-  char format[] = "%%%%%%%%";
+  // char format[] = "%%%%%%%%";
 
-  ck_assert_int_eq(s21_sprintf(str1, format), sprintf(str2, format));
+  ck_assert_int_eq(s21_sprintf(str1, "%%%%%%%%"), sprintf(str2, "%%%%%%%%"));
 
   ck_assert_str_eq(str1, str2);
 }
