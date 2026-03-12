@@ -27,9 +27,9 @@ extern int s21_sscanf(const char* str, const char* format, ...);
 extern int s21_sprintf(char* str, const char* format, ...);
 
 /* Part 5: extra functions from C#*/
-extern void *to_upper(const char *str);
-extern void *to_lower(const char *str);
-extern void *insert(const char *src, const char *str, s21_size start_index);
-extern void *trim(const char *src, const char *trim_chars);
+extern void *s21_to_upper(const char *str);
+extern void *s21_to_lower(const char *str);
+extern void *s21_insert(const char *src, const char *str, s21_size start_index);
+extern void *s21_trim(const char *src, const char *trim_chars);
 
 #endif
