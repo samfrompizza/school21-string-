@@ -1,188 +1,83 @@
-# =============================================================================
-# s21_string+ Makefile
-# =============================================================================
-
-# -----------------------------------------------------------------------------
-# Variables: Compiler & Flags
-# -----------------------------------------------------------------------------
 CC = gcc
-CFLAGS = -Wall -Werror -Wextra -O2 -g --std=gnu11
-SANITIZE_FLAGS = -fsanitize=address -fsanitize=leak -fsanitize=undefined -fsanitize=unreachable
-GCOV_FLAGS = -fprofile-arcs -ftest-coverage
+AR = ar
+RM = rm -rf
 
-ifdef SAN
-CFLAGS += $(SANITIZE_FLAGS)
-endif
+CFLAGS = -Wall -Wextra -Werror -std=c11
+LDFLAGS =
 
-# -----------------------------------------------------------------------------
-# Variables: Directories (run from src/ for CI build; from root for local)
-# -----------------------------------------------------------------------------
-SRC_DIR := $(if $(wildcard string/basic/*.c),.,src)
-TEST_DIR := $(if $(wildcard string/basic/*.c),../tests,tests)
+SRC_DIR = .
+TEST_DIR = ../tests
 BUILD_DIR = build
-STRING_LIB = s21_string.a
+OBJ_DIR = $(BUILD_DIR)/obj
+BIN_DIR = $(BUILD_DIR)/bin
+REPORT_DIR = report
 
-# -----------------------------------------------------------------------------
-# Variables: Source Files (mirrors src/ hierarchy)
-# -----------------------------------------------------------------------------
-STRING_SRCS  := $(wildcard $(SRC_DIR)/string/*.c) $(wildcard $(SRC_DIR)/string/*/*.c)
-SSCANF_SRCS  := $(wildcard $(SRC_DIR)/sscanf/*.c) $(wildcard $(SRC_DIR)/sscanf/*/*.c)
-SPRINTF_SRCS := $(wildcard $(SRC_DIR)/sprintf/*.c) $(wildcard $(SRC_DIR)/sprintf/*/*.c)
-EXTRA_SRCS   := $(wildcard $(SRC_DIR)/extra/*.c) $(wildcard $(SRC_DIR)/extra/*/*.c)
-COMMON_SRCS  := $(wildcard $(SRC_DIR)/common/*.c) $(wildcard $(SRC_DIR)/common/*/*.c)
-SRCS         := $(COMMON_SRCS) $(STRING_SRCS) $(SSCANF_SRCS) $(SPRINTF_SRCS) $(EXTRA_SRCS)
+LIB_NAME = s21_string.a
+TEST_SCAN_BIN = $(BIN_DIR)/test_scan
+TEST_SPRINTF_BIN = $(BIN_DIR)/test_sprintf
+TEST_GITHUB_BIN = $(BIN_DIR)/test_github
 
-# -----------------------------------------------------------------------------
-# Variables: Object Files
-# -----------------------------------------------------------------------------
-STRING_OBJS  := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(STRING_SRCS))
-SSCANF_OBJS  := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SSCANF_SRCS))
-SPRINTF_OBJS := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(SPRINTF_SRCS))
-EXTRA_OBJS   := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(EXTRA_SRCS))
-COMMON_OBJS  := $(patsubst $(SRC_DIR)/%.c, $(BUILD_DIR)/%.o, $(COMMON_SRCS))
-OBJS         := $(COMMON_OBJS) $(STRING_OBJS) $(SSCANF_OBJS) $(SPRINTF_OBJS) $(EXTRA_OBJS)
+LIB_SRCS = \
+	$(wildcard common/*.c) \
+	$(wildcard string/*.c) \
+	$(wildcard sscanf/*.c) \
+	$(wildcard sprintf/*.c) \
+	$(wildcard extra/*.c)
 
-# -----------------------------------------------------------------------------
-# Variables: Local Project Tests (mirrors src/ under tests/)
-# -----------------------------------------------------------------------------
-TEST_STRING_SRCS  := $(wildcard $(TEST_DIR)/string/*.c) $(wildcard $(TEST_DIR)/string/*/*.c)
-TEST_SSCANF_SRCS  := $(wildcard $(TEST_DIR)/sscanf/*.c) $(wildcard $(TEST_DIR)/sscanf/*/*.c)
-TEST_SPRINTF_SRCS := $(wildcard $(TEST_DIR)/sprintf/*.c) $(wildcard $(TEST_DIR)/sprintf/*/*.c)
-TEST_EXTRA_SRCS   := $(wildcard $(TEST_DIR)/extra/*.c) $(wildcard $(TEST_DIR)/extra/*/*.c)
-TEST_COMMON_SRCS  := $(wildcard $(TEST_DIR)/common/*.c) $(wildcard $(TEST_DIR)/common/*/*.c)
+LIB_OBJS = $(patsubst %.c,$(OBJ_DIR)/%.o,$(LIB_SRCS))
 
-TEST_STRING_OBJS  := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_STRING_SRCS))
-TEST_SSCANF_OBJS  := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_SSCANF_SRCS))
-TEST_SPRINTF_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_SPRINTF_SRCS))
-TEST_EXTRA_OBJS   := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_EXTRA_SRCS))
-TEST_COMMON_OBJS  := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_COMMON_SRCS))
-
-# -----------------------------------------------------------------------------
-# Variables: GitHub Upstream Tests (tests/github/ hierarchy)
-# -----------------------------------------------------------------------------
-TEST_GITHUB_STRING_SUBDIRS := basic compare mem search strerror
-TEST_GITHUB_SRCS := \
-  $(wildcard $(TEST_DIR)/github/*.c) \
-  $(wildcard $(TEST_DIR)/github/sscanf/*.c) \
-  $(wildcard $(TEST_DIR)/github/sprintf/*.c) \
-	$(wildcard $(TEST_DIR)/github/extra/*.c) \
-  $(foreach d,$(TEST_GITHUB_STRING_SUBDIRS),$(wildcard $(TEST_DIR)/github/string/$(d)/*.c))
-
-TEST_GITHUB_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_GITHUB_SRCS))
-
-# -----------------------------------------------------------------------------
-# Variables: Build Tools
-# -----------------------------------------------------------------------------
-FORMATER = clang-format
-LEAK_CHECKER = valgrind
-LEAK_CHECKER_FLAGS = --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose
+TEST_SCAN_SRC = $(TEST_DIR)/sscanf/test_scan.c
+TEST_SPRINTF_SRC = $(TEST_DIR)/sprintf/test_sprintf.c
+TEST_GITHUB_SRCS = $(filter-out $(TEST_DIR)/github/s21_tests.c, \
+	$(shell find $(TEST_DIR)/github -type f -name '*.c' | sort))
+TEST_GITHUB_MAIN = $(TEST_DIR)/github/s21_tests.c
 
 UNAME := $(shell uname -s)
 ifeq ($(UNAME),Linux)
-	TEST_LIBS = -lcheck -lm -lpthread -lrt -lsubunit
+	CHECK_LIBS = -lcheck -lm -lpthread -lrt -lsubunit
+else
+	CHECK_LIBS = -lcheck -lm -lpthread
 endif
-ifeq ($(UNAME),Darwin)
-	TEST_LIBS = -lcheck
+
+ifeq ($(GCOV),1)
+	CFLAGS += -fprofile-arcs -ftest-coverage -O0
+	LDFLAGS += -fprofile-arcs -ftest-coverage
 endif
 
-# =============================================================================
-# BUILD TARGETS
-# =============================================================================
+.PHONY: all clean test gcov_report
 
-.PHONY: all
-all: s21_string.a
+all: $(LIB_NAME)
 
-s21_string.a: $(OBJS)
-	ar rcs $@ $^
+$(LIB_NAME): $(LIB_OBJS)
+	$(AR) rcs $@ $^
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c
+$(OBJ_DIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: $(TEST_DIR)/%.c
-	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -Wno-unused-variable -Wno-stringop-truncation -c $< -o $@
+test: $(TEST_SCAN_BIN) $(TEST_SPRINTF_BIN) $(TEST_GITHUB_BIN)
+	$(TEST_SCAN_BIN)
+	$(TEST_SPRINTF_BIN)
+	$(TEST_GITHUB_BIN)
 
-# =============================================================================
-# TEST TARGETS
-# =============================================================================
+$(TEST_SCAN_BIN): $(TEST_SCAN_SRC) $(LIB_NAME)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $< $(LIB_NAME) -o $@ $(CHECK_LIBS) $(LDFLAGS)
 
-.PHONY: test test_all test_scan test_sprintf test_github \
-        test_github_string test_github_sscanf test_github_sprintf test_github_extra
+$(TEST_SPRINTF_BIN): $(TEST_SPRINTF_SRC) $(LIB_NAME)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $< $(LIB_NAME) -o $@ $(CHECK_LIBS) $(LDFLAGS)
 
-# Run all tests (local + GitHub)
-test: test_all
-test_all: test_scan test_sprintf test_github
+$(TEST_GITHUB_BIN): $(TEST_GITHUB_MAIN) $(TEST_GITHUB_SRCS) $(LIB_NAME)
+	@mkdir -p $(BIN_DIR)
+	$(CC) $(CFLAGS) $(TEST_GITHUB_MAIN) $(TEST_GITHUB_SRCS) \
+		$(LIB_NAME) -o $@ $(CHECK_LIBS) $(LDFLAGS)
 
-# Local: scan_string_var unit tests (sscanf core)
-test_scan: $(BUILD_DIR)/sscanf/test_scan.o $(STRING_LIB)
-	$(CC) $(CFLAGS) $(BUILD_DIR)/sscanf/test_scan.o $(STRING_LIB) -o test_scan $(TEST_LIBS)
-	./test_scan
-
-# Local: sprintf unit tests
-test_sprintf: $(BUILD_DIR)/sprintf/test_sprintf.o $(STRING_LIB)
-	$(CC) $(CFLAGS) $(BUILD_DIR)/sprintf/test_sprintf.o $(STRING_LIB) -o test_sprintf $(TEST_LIBS)
-	./test_sprintf
-
-# GitHub: full upstream test suite
-test_github: $(STRING_LIB) $(TEST_GITHUB_OBJS)
-	$(CC) $(CFLAGS) $(TEST_GITHUB_OBJS) $(STRING_LIB) -o test_github $(TEST_LIBS)
-	./test_github
-
-# GitHub: grouped by module (all use unified runner, run full suite per group)
-test_github_string: test_github
-test_github_sscanf: test_github
-test_github_sprintf: test_github
-test_github_extra: test_github
-
-# =============================================================================
-# LEAK CHECK TARGETS
-# =============================================================================
-
-.PHONY: leak_check leak_check_all leak_check_scan leak_check_sprintf leak_check_github
-
-leak_check: leak_check_all
-leak_check_all: leak_check_scan leak_check_sprintf leak_check_github
-
-leak_check_scan: test_scan
-	$(LEAK_CHECKER) $(LEAK_CHECKER_FLAGS) ./test_scan || true
-
-leak_check_sprintf: test_sprintf
-	$(LEAK_CHECKER) $(LEAK_CHECKER_FLAGS) ./test_sprintf || true
-
-leak_check_github: test_github
-	$(LEAK_CHECKER) $(LEAK_CHECKER_FLAGS) ./test_github || true
-
-# =============================================================================
-# CLEAN & REBUILD
-# =============================================================================
-
-.PHONY: clean rebuild
-rebuild: clean all
+gcov_report: clean
+	$(MAKE) GCOV=1 test
+	lcov --capture --directory . --output-file $(BUILD_DIR)/coverage.info
+	lcov --remove $(BUILD_DIR)/coverage.info '/usr/*' '$(TEST_DIR)/*' --output-file $(BUILD_DIR)/coverage.filtered.info
+	genhtml $(BUILD_DIR)/coverage.filtered.info --output-directory $(REPORT_DIR)
 
 clean:
-	rm -rf $(BUILD_DIR) $(STRING_LIB) report
-	rm -f test_scan test_sprintf test_github test_gcov test_string test_sscanf test_extra test_common
-	rm -f *.gc* gcov_report.info
-
-# =============================================================================
-# TOOLS (style, format, gcov_report)
-# =============================================================================
-
-.PHONY: style format gcov_report
-style:
-	$(FORMATER) -n $(shell find $(SRC_DIR) $(TEST_DIR) -name '*.c' -o -name '*.h')
-
-format:
-	$(FORMATER) -i $(shell find $(SRC_DIR) $(TEST_DIR) -name '*.c' -o -name '*.h')
-
-gcov_report:
-	$(MAKE) clean
-	$(CC) $(CFLAGS) $(GCOV_FLAGS) $(SRCS) $(TEST_STRING_SRCS) $(TEST_SSCANF_SRCS) \
-	      $(TEST_SPRINTF_SRCS) $(TEST_EXTRA_SRCS) $(TEST_COMMON_SRCS) \
-	      -o test_all $(TEST_LIBS)
-	./test_all
-	lcov -t "gcov_report" -o gcov_report.info -c -d .
-	genhtml -o report gcov_report.info
-	open report/index.html
-	$(MAKE) clean
+	$(RM) $(BUILD_DIR) $(REPORT_DIR) $(LIB_NAME) *.gcno *.gcda *.info
