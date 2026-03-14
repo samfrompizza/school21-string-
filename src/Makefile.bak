@@ -15,10 +15,10 @@ CFLAGS += $(SANITIZE_FLAGS)
 endif
 
 # -----------------------------------------------------------------------------
-# Variables: Directories
+# Variables: Directories (run from src/ for CI build; from root for local)
 # -----------------------------------------------------------------------------
-SRC_DIR = src
-TEST_DIR = tests
+SRC_DIR := $(if $(wildcard string/basic/*.c),.,src)
+TEST_DIR := $(if $(wildcard string/basic/*.c),../tests,tests)
 BUILD_DIR = build
 STRING_LIB = s21_string.a
 
@@ -65,6 +65,7 @@ TEST_GITHUB_SRCS := \
   $(wildcard $(TEST_DIR)/github/*.c) \
   $(wildcard $(TEST_DIR)/github/sscanf/*.c) \
   $(wildcard $(TEST_DIR)/github/sprintf/*.c) \
+	$(wildcard $(TEST_DIR)/github/extra/*.c) \
   $(foreach d,$(TEST_GITHUB_STRING_SUBDIRS),$(wildcard $(TEST_DIR)/github/string/$(d)/*.c))
 
 TEST_GITHUB_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_GITHUB_SRCS))
@@ -177,9 +178,11 @@ format:
 
 gcov_report:
 	$(MAKE) clean
-	$(CC) $(CFLAGS) -Wno-unused-variable -Wno-stringop-truncation $(GCOV_FLAGS) $(SRCS) $(TEST_GITHUB_SRCS) -o test_gcov $(TEST_LIBS)
-	./test_gcov
-	lcov -t "gcov_report" -o gcov_report.info -c -d . --ignore-errors inconsistent
-	genhtml -o report gcov_report.info --ignore-errors inconsistent
-	@if [ "$(UNAME)" = "Linux" ]; then xdg-open report/index.html 2>/dev/null || true; else open report/index.html; fi
-	@echo "Coverage report: report/index.html"
+	$(CC) $(CFLAGS) $(GCOV_FLAGS) $(SRCS) $(TEST_STRING_SRCS) $(TEST_SSCANF_SRCS) \
+	      $(TEST_SPRINTF_SRCS) $(TEST_EXTRA_SRCS) $(TEST_COMMON_SRCS) \
+	      -o test_all $(TEST_LIBS)
+	./test_all
+	lcov -t "gcov_report" -o gcov_report.info -c -d .
+	genhtml -o report gcov_report.info
+	open report/index.html
+	$(MAKE) clean
