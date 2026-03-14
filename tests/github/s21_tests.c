@@ -19,7 +19,8 @@ void run_tests(void) {
                      suite_memcpy(),  suite_memset(),  suite_strchr(),
                      suite_strrchr(), suite_strpbrk(), suite_strcspn(),
                      suite_strstr(),  suite_strtok(),  suite_strerror(),
-                     suite_sprintf(), suite_sscanf(),  NULL};
+                     suite_sprintf(), suite_sscanf(),  suite_to_upper(), 
+                     suite_to_lower(), suite_insert(), suite_trim(), NULL};
 
   for (size_t i = 0; suites[i] != NULL; ++i) {
     run_testcase(suites[i]);

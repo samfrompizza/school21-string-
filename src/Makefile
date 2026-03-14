@@ -65,6 +65,7 @@ TEST_GITHUB_SRCS := \
   $(wildcard $(TEST_DIR)/github/*.c) \
   $(wildcard $(TEST_DIR)/github/sscanf/*.c) \
   $(wildcard $(TEST_DIR)/github/sprintf/*.c) \
+	$(wildcard $(TEST_DIR)/github/extra/*.c) \
   $(foreach d,$(TEST_GITHUB_STRING_SUBDIRS),$(wildcard $(TEST_DIR)/github/string/$(d)/*.c))
 
 TEST_GITHUB_OBJS := $(patsubst $(TEST_DIR)/%.c, $(BUILD_DIR)/%.o, $(TEST_GITHUB_SRCS))
