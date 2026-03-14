@@ -2168,9 +2168,9 @@ START_TEST(hard5) {
 }
 END_TEST
 
-Suite* suite_sscanf(void) {
-  Suite* s = suite_create("suite_sscanf");
-  TCase* tc = tcase_create("sscanf_tc");
+Suite *suite_sscanf(void) {
+  Suite *s = suite_create("suite_sscanf");
+  TCase *tc = tcase_create("sscanf_tc");
   // %[width][length][specifier]
 
   // [EOF]

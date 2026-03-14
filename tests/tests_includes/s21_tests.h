@@ -26,7 +26,6 @@
 /* Size/type aliases used by upstream tests */
 typedef s21_size s21_size_t;
 
-
 Suite* suite_memchr(void);
 Suite* suite_memcmp(void);
 Suite* suite_memcpy(void);

@@ -14,13 +14,17 @@ void run_testcase(Suite* testcase) {
 }
 
 void run_tests(void) {
-  Suite* suites[] = {suite_strlen(),  suite_strncpy(), suite_strncat(),
-                     suite_strncmp(), suite_memchr(),  suite_memcmp(),
-                     suite_memcpy(),  suite_memset(),  suite_strchr(),
-                     suite_strrchr(), suite_strpbrk(), suite_strcspn(),
-                     suite_strstr(),  suite_strtok(),  suite_strerror(),
-                     suite_sprintf(), suite_sscanf(),  suite_to_upper(), 
-                     suite_to_lower(), suite_insert(), suite_trim(), NULL};
+  Suite* suites[] = {suite_strlen(),   suite_strncpy(),
+                     suite_strncat(),  suite_strncmp(),
+                     suite_memchr(),   suite_memcmp(),
+                     suite_memcpy(),   suite_memset(),
+                     suite_strchr(),   suite_strrchr(),
+                     suite_strpbrk(),  suite_strcspn(),
+                     suite_strstr(),   suite_strtok(),
+                     suite_strerror(), suite_sprintf(),
+                     suite_sscanf(),   suite_to_upper(),
+                     suite_to_lower(), suite_insert(),
+                     suite_trim(),     NULL};
 
   for (size_t i = 0; suites[i] != NULL; ++i) {
     run_testcase(suites[i]);

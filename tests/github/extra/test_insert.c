@@ -66,9 +66,9 @@ START_TEST(null_inputs) {
 }
 END_TEST
 
-Suite* suite_insert(void) {
-  Suite* s = suite_create("suite_insert");
-  TCase* tc = tcase_create("insert_tc");
+Suite *suite_insert(void) {
+  Suite *s = suite_create("suite_insert");
+  TCase *tc = tcase_create("insert_tc");
 
   tcase_add_test(tc, insert_begin);
   tcase_add_test(tc, insert_middle);

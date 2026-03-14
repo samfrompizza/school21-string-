@@ -1,6 +1,6 @@
-#include "../string/s21_string.h"
-
 #include <stdlib.h>
+
+#include "../string/s21_string.h"
 
 void *s21_insert(const char *src, const char *str, s21_size start_index) {
   if (src == S21_NULL || str == S21_NULL) return S21_NULL;
@@ -18,7 +18,8 @@ void *s21_insert(const char *src, const char *str, s21_size start_index) {
 
   for (s21_size i = 0; i < str_len; ++i) new_str[start_index + i] = str[i];
 
-  for (s21_size i = start_index; i < src_len; ++i) new_str[str_len + i] = src[i];
+  for (s21_size i = start_index; i < src_len; ++i)
+    new_str[str_len + i] = src[i];
 
   new_str[new_len] = '\0';
   return (void *)new_str;

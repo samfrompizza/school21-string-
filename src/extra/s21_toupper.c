@@ -1,6 +1,6 @@
-#include "../string/s21_string.h"
-
 #include <stdlib.h>
+
+#include "../string/s21_string.h"
 
 void *s21_to_upper(const char *str) {
   if (str == S21_NULL) return S21_NULL;

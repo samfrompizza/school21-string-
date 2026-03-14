@@ -43,9 +43,9 @@ START_TEST(null_input) {
 }
 END_TEST
 
-Suite* suite_to_upper(void) {
-  Suite* s = suite_create("suite_to_upper");
-  TCase* tc = tcase_create("to_upper_tc");
+Suite *suite_to_upper(void) {
+  Suite *s = suite_create("suite_to_upper");
+  TCase *tc = tcase_create("to_upper_tc");
 
   tcase_add_test(tc, empty);
   tcase_add_test(tc, mixed_ascii);

@@ -43,9 +43,9 @@ START_TEST(null_input) {
 }
 END_TEST
 
-Suite* suite_to_lower(void) {
-  Suite* s = suite_create("suite_to_lower");
-  TCase* tc = tcase_create("to_lower_tc");
+Suite *suite_to_lower(void) {
+  Suite *s = suite_create("suite_to_lower");
+  TCase *tc = tcase_create("to_lower_tc");
 
   tcase_add_test(tc, empty);
   tcase_add_test(tc, mixed_ascii);

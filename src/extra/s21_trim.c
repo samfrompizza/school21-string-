@@ -1,6 +1,6 @@
-#include "../string/s21_string.h"
-
 #include <stdlib.h>
+
+#include "../string/s21_string.h"
 
 static int char_in_set(char c, const char *set) {
   if (set == S21_NULL) return 0;

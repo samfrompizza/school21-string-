@@ -51,9 +51,9 @@ START_TEST(null_input) {
 }
 END_TEST
 
-Suite* suite_trim(void) {
-  Suite* s = suite_create("suite_trim");
-  TCase* tc = tcase_create("trim_tc");
+Suite *suite_trim(void) {
+  Suite *s = suite_create("suite_trim");
+  TCase *tc = tcase_create("trim_tc");
 
   tcase_add_test(tc, trim_default_whitespace);
   tcase_add_test(tc, trim_custom_chars);
